@@ -50,14 +50,37 @@ export default function LoginPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: auth, error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password ?? '',
     });
+
+    if (error || !auth.user) {
+      setLoading(false);
+      setMessage({ type: 'error', text: 'Email ou mot de passe incorrect.' });
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, entity_id')
+      .eq('id', auth.user.id)
+      .single();
+
     setLoading(false);
 
-    if (error) {
-      setMessage({ type: 'error', text: 'Email ou mot de passe incorrect.' });
+    const role = profile?.role as string | undefined;
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+
+    if (redirect) {
+      window.location.href = redirect;
+    } else if (role === 'admin') {
+      window.location.href = '/admin';
+    } else if (role === 'producer') {
+      window.location.href = '/producer';
+    } else if (role === 'client' && !profile?.entity_id) {
+      window.location.href = '/onboarding/entity';
     } else {
       window.location.href = '/shop';
     }
