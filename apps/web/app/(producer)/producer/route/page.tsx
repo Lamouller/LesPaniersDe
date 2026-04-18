@@ -4,6 +4,7 @@ import { getProducerContext } from '@/lib/auth/producer-context';
 import { createClient } from '@/lib/supabase/server';
 import { ViewAsBanner } from '@/components/admin/ViewAsBanner';
 import { RouteClient } from './RouteClient';
+import type { VehicleConfig } from '@/lib/economics/fuel';
 
 
 export default async function ProducerRoutePage() {
@@ -17,6 +18,26 @@ export default async function ProducerRoutePage() {
   }
 
   const supabase = await createClient();
+
+  // Fetch producer vehicle config
+  const { data: producerData } = await supabase
+    .from('producers')
+    .select(
+      'vehicle_type, vehicle_fuel_type, vehicle_consumption_l_per_100km, vehicle_kwh_per_100km, custom_diesel_price_eur, custom_gasoline_price_eur, custom_electric_price_eur'
+    )
+    .eq('id', ctx.producerId)
+    .single();
+
+  const vehicleConfig: VehicleConfig | null = producerData?.vehicle_fuel_type
+    ? {
+        fuel_type: producerData.vehicle_fuel_type as VehicleConfig['fuel_type'],
+        consumption_l_per_100km: producerData.vehicle_consumption_l_per_100km as number | null,
+        kwh_per_100km: producerData.vehicle_kwh_per_100km as number | null,
+        custom_diesel_price_eur: producerData.custom_diesel_price_eur as number | null,
+        custom_gasoline_price_eur: producerData.custom_gasoline_price_eur as number | null,
+        custom_electric_price_eur: producerData.custom_electric_price_eur as number | null,
+      }
+    : null;
 
   // Fetch entities linked to this producer (with lat/lng)
   const { data: producerEntities } = await supabase
@@ -109,7 +130,7 @@ export default async function ProducerRoutePage() {
   return (
     <>
       {ctx.isViewAs && <ViewAsBanner producerName={ctx.producerName} />}
-      <RouteClient readOnly={ctx.isReadOnly} initialEntities={waypoints} />
+      <RouteClient readOnly={ctx.isReadOnly} initialEntities={waypoints} vehicleConfig={vehicleConfig} />
     </>
   );
 }

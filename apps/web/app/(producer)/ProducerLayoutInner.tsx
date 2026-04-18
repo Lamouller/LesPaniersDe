@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, BookOpen, MapPin, MessageSquare, TrendingUp, Package } from 'lucide-react';
+import { LayoutDashboard, BookOpen, MapPin, MessageSquare, TrendingUp, Package, Settings } from 'lucide-react';
 import { UserMenu } from '@/components/layout/UserMenu';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
@@ -13,6 +13,7 @@ const producerNav = [
   { href: '/producer/route', label: 'Tournée', icon: MapPin },
   { href: '/producer/messages', label: 'Messages', icon: MessageSquare },
   { href: '/producer/forecast', label: 'Prévisionnel', icon: TrendingUp },
+  { href: '/producer/settings', label: 'Paramètres', icon: Settings },
 ];
 
 interface ProducerLayoutInnerProps {
