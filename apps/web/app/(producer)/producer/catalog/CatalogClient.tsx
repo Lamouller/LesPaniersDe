@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { BookOpen, Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { format, startOfWeek, addDays } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { BookOpen, Plus, Trash2, ToggleLeft, ToggleRight, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +26,16 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [maxOrders, setMaxOrders] = useState(50);
   const [deadline, setDeadline] = useState('2025-04-17T20:00');
+
+  const weekStart = useMemo(() => {
+    const monday = startOfWeek(new Date(), { weekStartsOn: 1 });
+    return format(monday, "d MMMM yyyy", { locale: fr });
+  }, []);
+
+  const deliveryDate = useMemo(() => {
+    const saturday = addDays(startOfWeek(new Date(), { weekStartsOn: 1 }), 5);
+    return format(saturday, "EEEE d MMMM yyyy", { locale: fr });
+  }, []);
   const [items, setItems] = useState<CatalogItem[]>([
     { id: '1', name: 'Petit panier', price_cents: 1500, max_qty: 20 },
     { id: '2', name: 'Panier moyen', price_cents: 2500, max_qty: 20 },
@@ -60,15 +73,25 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <BookOpen className="w-5 h-5 text-neutral-400" />
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <BookOpen className="w-5 h-5 text-neutral-400 mt-1 flex-shrink-0" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Catalogue hebdo</h1>
-            <p className="text-sm text-neutral-500">Semaine en cours</p>
+            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Catalogue de la semaine</h1>
+            <p className="text-sm text-neutral-500">Ouverture des commandes pour la semaine du {weekStart}</p>
+            <p className="text-xs text-neutral-600 mt-0.5">Livraison prévue le {deliveryDate}</p>
           </div>
         </div>
-        <Badge variant={isOpen ? 'success' : 'default'}>{isOpen ? 'Ouvert' : 'Fermé'}</Badge>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <Link
+            href="/producer/products"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-neutral-400 border border-white/10 hover:bg-white/5 hover:text-neutral-200 transition-colors"
+          >
+            <Package className="w-3.5 h-3.5" />
+            Modifier mes produits permanents →
+          </Link>
+          <Badge variant={isOpen ? 'success' : 'default'}>{isOpen ? 'Ouvert' : 'Fermé'}</Badge>
+        </div>
       </div>
 
       {/* Paramètres */}

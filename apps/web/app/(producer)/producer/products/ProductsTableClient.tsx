@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Package, ShoppingBasket, Apple, Egg, MoreHorizontal, Plus, Check, Loader2, Trash2, Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
+import { Package, ShoppingBasket, Apple, Egg, MoreHorizontal, Plus, Check, Loader2, Trash2, Eye, EyeOff, Info } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -535,7 +536,7 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
           <Package className="w-5 h-5 text-neutral-400" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Mes produits</h1>
-            <p className="text-sm text-neutral-500">Catalogue permanent — édition des prix et infos</p>
+            <p className="text-sm text-neutral-500">Catalogue permanent — tout ce que tu proposes à l&apos;année. L&apos;ouverture des commandes se fait par semaine.</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -559,6 +560,17 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
             </Button>
           )}
         </div>
+      </div>
+
+      {/* Hint catalogue hebdo */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Info className="w-4 h-4 flex-shrink-0 text-neutral-500" />
+        <span>
+          Pour ouvrir des commandes, rendez-vous dans{' '}
+          <Link href="/producer/catalog" className="text-primary hover:underline font-medium">
+            Catalogue hebdo →
+          </Link>
+        </span>
       </div>
 
       {/* Sections par kind */}
