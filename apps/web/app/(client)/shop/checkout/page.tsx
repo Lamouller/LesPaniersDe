@@ -1,88 +1,69 @@
 import React from 'react';
-import Link from 'next/link';
-import { MapPin, Info, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import CheckoutClient from './CheckoutClient';
 
-export default function CheckoutPage() {
+const DAYS_FR = [
+  'dimanche',
+  'lundi',
+  'mardi',
+  'mercredi',
+  'jeudi',
+  'vendredi',
+  'samedi',
+];
+
+export default async function CheckoutPage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  // Profile + entity
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('entity_id, ordering_blocked_until')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.entity_id) redirect('/onboarding/entity');
+
+  // Entity details
+  const { data: entity } = await supabase
+    .from('entities')
+    .select('id, name, pickup_address, pickup_instructions')
+    .eq('id', profile.entity_id)
+    .single();
+
+  // Producer entities for delivery info
+  const { data: producerEntities } = await supabase
+    .from('producer_entities')
+    .select('producer_id, delivery_day, time_from, time_to')
+    .eq('entity_id', profile.entity_id)
+    .eq('is_active', true);
+
+  // Format delivery info (use first active producer)
+  let deliveryInfo = '';
+  if (producerEntities && producerEntities.length > 0) {
+    const pe = producerEntities[0];
+    const dayName = pe.delivery_day != null ? DAYS_FR[pe.delivery_day] : null;
+    const timeFrom = pe.time_from ? pe.time_from.slice(0, 5) : null;
+    const timeTo = pe.time_to ? pe.time_to.slice(0, 5) : null;
+    if (dayName && timeFrom && timeTo) {
+      deliveryInfo = `${dayName} entre ${timeFrom} et ${timeTo}`;
+    } else if (dayName) {
+      deliveryInfo = dayName;
+    }
+  }
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-3 mb-8">
-        <Link href="/shop">
-          <button
-            type="button"
-            className="p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
-            aria-label="Retour"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-        </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Récapitulatif</h1>
-      </div>
-
-      {/* Empty state placeholder */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Votre panier</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {/* Placeholder items */}
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <div>
-                <p className="text-sm font-medium text-neutral-200">Panier moyen</p>
-                <p className="text-xs text-neutral-500">Légumes + fruits · ×1</p>
-              </div>
-              <span className="text-sm font-semibold text-neutral-50">25,00 €</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-white/5">
-              <div>
-                <p className="text-sm font-medium text-neutral-200">Option fruits</p>
-                <p className="text-xs text-neutral-500">Supplément · ×1</p>
-              </div>
-              <span className="text-sm font-semibold text-neutral-50">8,00 €</span>
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <p className="text-base font-semibold text-neutral-50">Total</p>
-              <span className="text-lg font-bold text-neutral-50">33,00 €</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Pickup info */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-neutral-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-semibold text-neutral-200">Lieu de retrait</p>
-              <p className="text-sm text-neutral-400 mt-1">Open Space du Centre — 12 rue des Entrepreneurs, Lyon 2e</p>
-              <p className="text-xs text-neutral-600 mt-1">Livraison prévue vendredi entre 12h et 14h</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payment info */}
-      <div className="flex items-start gap-3 px-4 py-4 bg-blue-500/10 border border-blue-500/20 rounded-xl mb-8">
-        <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-semibold text-blue-300">Paiement au retrait</p>
-          <p className="text-sm text-blue-400/80 mt-1 leading-relaxed">
-            Vous paierez en direct lors du retrait à votre entité — cash, CB, virement ou chèque
-            selon les préférences du producteur. Aucun paiement en ligne n'est collecté.
-          </p>
-        </div>
-      </div>
-
-      <Button type="submit" className="w-full" size="lg">
-        Confirmer la commande
-      </Button>
-
-      <p className="text-center text-xs text-neutral-600 mt-4">
-        Vous pouvez annuler votre commande jusqu'au jeudi 20h
-      </p>
-    </div>
+    <CheckoutClient
+      entityName={entity?.name ?? ''}
+      pickupAddress={entity?.pickup_address ?? ''}
+      pickupInstructions={entity?.pickup_instructions ?? null}
+      deliveryInfo={deliveryInfo}
+    />
   );
 }
