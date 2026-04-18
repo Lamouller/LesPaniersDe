@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Play, Square, Loader2, AlertCircle, ChevronLeft, MapPin, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { NavWaypoint } from '@/components/producer/NavigationMap';
@@ -52,6 +52,17 @@ function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
       Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// Bearing (degrees 0-360) from A to B
+function bearingBetween(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const toDeg = (r: number) => (r * 180) / Math.PI;
+  const y = Math.sin(toRad(lng2 - lng1)) * Math.cos(toRad(lat2));
+  const x =
+    Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+    Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(toRad(lng2 - lng1));
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
 }
 
 // Find closest step index from current position
@@ -109,7 +120,11 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
   // Stop confirmation state
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
+  const searchParams = useSearchParams();
+  const isDemo = searchParams?.get('demo') === '1';
+
   const watchIdRef = useRef<number | null>(null);
+  const demoIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const lastTrackRef = useRef<number>(0);
   const prevPosRef = useRef<{ lat: number; lng: number } | null>(null);
@@ -256,6 +271,44 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
       await fetch(`/api/deliveries/${currentDeliveryId}/start`, { method: 'POST' });
     }
 
+    if (isDemo && polyline.length > 1) {
+      // Mode démo : simule le déplacement le long de la polyline
+      let idx = 0;
+      let lastEmitIdx = -1;
+      const total = polyline.length;
+      const emitEvery = Math.max(1, Math.floor(total / 120)); // ~120 steps over the polyline
+      demoIntervalRef.current = setInterval(() => {
+        if (idx >= total) {
+          if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+          return;
+        }
+        if (idx - lastEmitIdx >= emitEvery || idx === total - 1) {
+          const [lat, lng] = polyline[idx];
+          const next = polyline[Math.min(idx + emitEvery, total - 1)];
+          const brng = bearingBetween(lat, lng, next[0], next[1]);
+          const coords: GeolocationCoordinates = {
+            latitude: lat,
+            longitude: lng,
+            accuracy: 5,
+            altitude: null,
+            altitudeAccuracy: null,
+            heading: brng,
+            speed: 13.9, // ~50 km/h
+            toJSON() { return this; },
+          } as GeolocationCoordinates;
+          handleGpsUpdate({
+            coords,
+            timestamp: Date.now(),
+            toJSON() { return this; },
+          } as GeolocationPosition);
+          lastEmitIdx = idx;
+        }
+        idx++;
+      }, 400);
+      setNavState('active');
+      return;
+    }
+
     const watchId = navigator.geolocation.watchPosition(
       handleGpsUpdate,
       (err) => {
@@ -276,6 +329,10 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
+    }
+    if (demoIntervalRef.current) {
+      clearInterval(demoIntervalRef.current);
+      demoIntervalRef.current = null;
     }
     await releaseWakeLock();
     if (typeof window !== 'undefined') window.speechSynthesis?.cancel();

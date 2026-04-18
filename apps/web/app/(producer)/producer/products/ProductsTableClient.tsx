@@ -272,14 +272,15 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
             onClick={() => { void handleToggle(); }}
             disabled={readOnly || toggling}
             aria-label={isActive ? 'Désactiver' : 'Activer'}
-            className={`inline-flex items-center h-6 w-11 rounded-full transition-colors duration-200 shadow-md ring-1 ring-black/10
-              ${isActive ? 'bg-primary' : 'bg-neutral-500/60'}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shadow-md ring-1 ring-black/10
+              ${isActive ? 'bg-primary' : 'bg-neutral-500/70'}
               disabled:opacity-50 disabled:cursor-not-allowed
               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50`}
           >
             <span
-              className={`block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200
-                ${isActive ? 'translate-x-[22px]' : 'translate-x-0.5'}`}
+              aria-hidden="true"
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform duration-200
+                ${isActive ? 'translate-x-5' : 'translate-x-0.5'}`}
             />
           </button>
         </div>
