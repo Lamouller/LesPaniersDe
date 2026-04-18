@@ -5,7 +5,9 @@ const withNextIntl = createNextIntlPlugin('./lib/i18n/request.ts');
 
 const withPWA = withPWAInit({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  // PWA temporairement désactivée : le service worker cache /admin, /shop, /account
+  // et casse la session (bug Phase 2). À réactiver Phase 3 avec exclusions correctes.
+  disable: true,
   register: true,
   skipWaiting: true,
 });
