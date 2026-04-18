@@ -34,6 +34,20 @@
 |---|---|---|
 | ![Producer dashboard](docs/screenshots/30-producer-dashboard.png) | ![Producer forecast](docs/screenshots/31-producer-forecast.png) | ![Producer catalog](docs/screenshots/32-producer-catalog.png) |
 
+### Optimisation de tournée (OSRM + OpenStreetMap)
+Tournée hebdo auto-optimisée sur 6 arrêts Occitanie : **Toulouse · Labège (IoT Valley) · Blagnac · Castres · Albi · Montauban**.
+
+![Tournée producteur optimisée OSRM](docs/screenshots/33-producer-route-osrm.png)
+
+### Mobile (iPhone 13)
+| Landing | Shop | Stats & badges |
+|---|---|---|
+| ![Mobile landing](docs/screenshots/mobile-01-landing.png) | ![Mobile shop](docs/screenshots/mobile-10-shop.png) | ![Mobile stats](docs/screenshots/mobile-13-stats.png) |
+
+| Admin | Forecast producteur | Produits producteur |
+|---|---|---|
+| ![Mobile admin](docs/screenshots/mobile-20-admin.png) | ![Mobile forecast](docs/screenshots/mobile-31-forecast.png) | ![Mobile products](docs/screenshots/mobile-33-products.png) |
+
 ---
 
 ## Fonctionnalités

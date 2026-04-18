@@ -1,15 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
+import '@fontsource-variable/inter';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+// Self-hosted Inter (package @fontsource-variable/inter) — aucune dépendance Google Fonts,
+// build reproductible même hors ligne
+const inter = { variable: 'font-sans' };
 
 export const metadata: Metadata = {
   title: 'LesPaniersDe — Circuits courts, retrait en entreprise',
