@@ -1,7 +1,7 @@
 import React from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { TrendingUp, ShoppingBasket, CalendarDays, RefreshCw } from 'lucide-react';
+import { TrendingUp, ShoppingBasket, CalendarDays, RefreshCw, Fuel, Leaf, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ForecastKPI } from '@/components/producer/ForecastKPI';
 import { WeekForecastRow } from '@/components/producer/WeekForecastRow';
@@ -9,6 +9,9 @@ import { TrendChart } from '@/components/producer/TrendChart';
 import { formatCents } from '@/lib/utils';
 import { getProducerContext } from '@/lib/auth/producer-context';
 import { ViewAsBanner } from '@/components/admin/ViewAsBanner';
+import { calculateRouteEconomics } from '@/lib/economics/fuel';
+import type { VehicleConfig } from '@/lib/economics/fuel';
+import Link from 'next/link';
 
 // ---------------------------------------------------------------
 // Types
@@ -60,6 +63,7 @@ async function getProducerForecast(producerId: string) {
     { data: entityForecast },
     { data: trend },
     { data: subscriptions },
+    { data: producerVehicle },
   ] = await Promise.all([
     supabase
       .from('v_producer_forecast_weekly')
@@ -81,13 +85,32 @@ async function getProducerForecast(producerId: string) {
       .select('id', { count: 'exact', head: true })
       .eq('producer_id', producerId)
       .eq('status', 'active'),
+    supabase
+      .from('producers')
+      .select(
+        'vehicle_fuel_type, vehicle_consumption_l_per_100km, vehicle_kwh_per_100km, custom_diesel_price_eur, custom_gasoline_price_eur, custom_electric_price_eur'
+      )
+      .eq('id', producerId)
+      .single(),
   ]);
+
+  const vehicleConfig: VehicleConfig | null = producerVehicle?.vehicle_fuel_type
+    ? {
+        fuel_type: producerVehicle.vehicle_fuel_type as VehicleConfig['fuel_type'],
+        consumption_l_per_100km: producerVehicle.vehicle_consumption_l_per_100km as number | null,
+        kwh_per_100km: producerVehicle.vehicle_kwh_per_100km as number | null,
+        custom_diesel_price_eur: producerVehicle.custom_diesel_price_eur as number | null,
+        custom_gasoline_price_eur: producerVehicle.custom_gasoline_price_eur as number | null,
+        custom_electric_price_eur: producerVehicle.custom_electric_price_eur as number | null,
+      }
+    : null;
 
   return {
     weeklyForecast: (weeklyForecast ?? []) as ForecastWeekRow[],
     entityForecast: (entityForecast ?? []) as ForecastEntityRow[],
     trend: (trend ?? []) as TrendRow[],
     activeSubscriptions: subscriptions?.length ?? 0,
+    vehicleConfig,
   };
 }
 
@@ -104,13 +127,48 @@ export default async function ProducerForecastPage() {
     redirect('/');
   }
 
-  const { weeklyForecast, entityForecast, trend, activeSubscriptions } =
+  const { weeklyForecast, entityForecast, trend, activeSubscriptions, vehicleConfig } =
     await getProducerForecast(ctx.producerId);
 
   // KPI values
   const currentWeek = weeklyForecast.find((w) => w.week_offset === 0);
   const nextWeek = weeklyForecast.find((w) => w.week_offset === 1);
   const total4w = weeklyForecast.reduce((sum, w) => sum + (w.total_cents ?? 0), 0);
+
+  // ---- Impact environnemental estimé 4 semaines ----
+  // Estimation simple : on utilise une distance de tournée forfaitaire (200 km si pas de données OSRM)
+  // En pratique, l'admin peut améliorer ça en stockant la distance OSRM dans les deliveries.
+  const ESTIMATED_TOUR_DISTANCE_M = 200_000; // 200 km par tournée (estimation conservative)
+
+  interface WeekEnvImpact {
+    week_label: string;
+    cost_eur: number | null;
+    co2_kg: number | null;
+    savings_eur: number | null;
+    savings_co2_kg: number | null;
+  }
+
+  const envImpact4w: WeekEnvImpact[] = weeklyForecast.map((w) => {
+    if (!vehicleConfig) {
+      return { week_label: w.week_label, cost_eur: null, co2_kg: null, savings_eur: null, savings_co2_kg: null };
+    }
+    const eco = calculateRouteEconomics(ESTIMATED_TOUR_DISTANCE_M, vehicleConfig);
+    if (!eco) {
+      return { week_label: w.week_label, cost_eur: null, co2_kg: null, savings_eur: null, savings_co2_kg: null };
+    }
+    return {
+      week_label: w.week_label,
+      cost_eur: eco.cost_eur,
+      co2_kg: eco.co2_kg,
+      savings_eur: eco.vs_naive.savings_eur,
+      savings_co2_kg: eco.vs_naive.savings_co2_kg,
+    };
+  });
+
+  const totalCostEur4w = envImpact4w.reduce((s, w) => s + (w.cost_eur ?? 0), 0);
+  const totalCo2Kg4w = envImpact4w.reduce((s, w) => s + (w.co2_kg ?? 0), 0);
+  const totalSavingsEur4w = envImpact4w.reduce((s, w) => s + (w.savings_eur ?? 0), 0);
+  const totalSavingsCo24w = envImpact4w.reduce((s, w) => s + (w.savings_co2_kg ?? 0), 0);
 
   // "À produire semaine prochaine" aggregate
   const nextWeekEntities = entityForecast.filter((e) => {
@@ -255,6 +313,92 @@ export default async function ProducerForecastPage() {
             </table>
           </div>
         </Card>
+
+        {/* Impact environnemental 4 semaines */}
+        {vehicleConfig ? (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Leaf className="w-4 h-4 text-green-500" />
+                Impact environnemental — 4 semaines
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground mb-4">
+                Estimé sur une tournée de ~200 km/semaine.{' '}
+                <Link href="/producer/settings" className="underline">
+                  Ajuster les paramètres véhicule
+                </Link>
+              </p>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                {envImpact4w.map((w) => (
+                  <div
+                    key={w.week_label}
+                    className="flex flex-col gap-1 p-3 rounded-xl bg-white/5 border border-white/10"
+                  >
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      {w.week_label}
+                    </p>
+                    {w.cost_eur !== null ? (
+                      <>
+                        <p className="text-sm font-bold text-foreground flex items-center gap-1">
+                          <Fuel className="w-3 h-3 text-muted-foreground" />
+                          {w.cost_eur.toFixed(2).replace('.', ',')} €
+                        </p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Leaf className="w-3 h-3 text-green-500" />
+                          {w.co2_kg} kg CO₂
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">—</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Cumul 4 semaines */}
+              <div className="flex flex-wrap gap-3 pt-3 border-t border-white/10">
+                <div className="flex items-center gap-2 px-3 py-2 bg-accent/10 border border-accent/20 rounded-xl">
+                  <Fuel className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">
+                    Total : {totalCostEur4w.toFixed(2).replace('.', ',')} €
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl">
+                  <Leaf className="w-4 h-4 text-green-500" />
+                  <span className="text-sm font-semibold text-foreground">
+                    {Math.round(totalCo2Kg4w * 10) / 10} kg CO₂
+                  </span>
+                </div>
+                {totalSavingsEur4w > 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-500/5 border border-green-500/10 rounded-xl">
+                    <TrendingDown className="w-4 h-4 text-green-500" />
+                    <span className="text-sm text-muted-foreground">
+                      Économie vs non optimisé :{' '}
+                      <span className="font-semibold text-green-500">
+                        {totalSavingsEur4w.toFixed(2).replace('.', ',')} €
+                      </span>{' '}
+                      ·{' '}
+                      <span className="font-semibold text-green-500">
+                        {Math.round(totalSavingsCo24w * 10) / 10} kg CO₂
+                      </span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="mb-8 px-4 py-3 bg-muted/30 border border-border rounded-xl text-sm text-muted-foreground flex items-center gap-2">
+            <Fuel className="w-4 h-4 flex-shrink-0" />
+            Configurez votre véhicule dans{' '}
+            <Link href="/producer/settings" className="underline font-medium text-foreground ml-1">
+              Paramètres
+            </Link>{' '}
+            pour voir l&apos;impact environnemental de vos tournées.
+          </div>
+        )}
 
         {/* Bloc "À produire semaine prochaine" */}
         {nextWeek && (

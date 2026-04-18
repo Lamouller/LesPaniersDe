@@ -1,13 +1,15 @@
 import React from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { TrendingUp, Users, ShoppingBasket, AlertTriangle, Download } from 'lucide-react';
+import { TrendingUp, Users, ShoppingBasket, AlertTriangle, Download, Fuel, Leaf, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CapacityAlerts } from '@/components/admin/CapacityAlerts';
 import { ProducerBreakdownChart } from '@/components/admin/ProducerBreakdownChart';
 import { formatCents } from '@/lib/utils';
 import Link from 'next/link';
+import { calculateRouteEconomics } from '@/lib/economics/fuel';
+import type { VehicleConfig } from '@/lib/economics/fuel';
 
 // ---------------------------------------------------------------
 // Types
@@ -37,10 +39,20 @@ interface CapacityAlert {
 // ---------------------------------------------------------------
 // Data fetching
 // ---------------------------------------------------------------
+interface ProducerVehicleRow {
+  id: string;
+  vehicle_fuel_type: string | null;
+  vehicle_consumption_l_per_100km: number | null;
+  vehicle_kwh_per_100km: number | null;
+  custom_diesel_price_eur: number | null;
+  custom_gasoline_price_eur: number | null;
+  custom_electric_price_eur: number | null;
+}
+
 async function getAdminForecast() {
   const supabase = await createClient();
 
-  const [{ data: aggregate }, { data: capacityAlerts }] = await Promise.all([
+  const [{ data: aggregate }, { data: capacityAlerts }, { data: producerVehicles }] = await Promise.all([
     supabase
       .from('v_admin_forecast_aggregate')
       .select('*')
@@ -50,11 +62,18 @@ async function getAdminForecast() {
       .select('*')
       .not('severity', 'is', null)
       .order('fill_pct', { ascending: false }),
+    supabase
+      .from('producers')
+      .select(
+        'id, vehicle_fuel_type, vehicle_consumption_l_per_100km, vehicle_kwh_per_100km, custom_diesel_price_eur, custom_gasoline_price_eur, custom_electric_price_eur'
+      )
+      .eq('is_active', true),
   ]);
 
   return {
     aggregate: (aggregate ?? []) as AggregateRow[],
     capacityAlerts: (capacityAlerts ?? []) as CapacityAlert[],
+    producerVehicles: (producerVehicles ?? []) as ProducerVehicleRow[],
   };
 }
 
@@ -77,7 +96,7 @@ export default async function AdminForecastPage() {
 
   if (profile?.role !== 'admin') redirect('/');
 
-  const { aggregate, capacityAlerts } = await getAdminForecast();
+  const { aggregate, capacityAlerts, producerVehicles } = await getAdminForecast();
 
   // Grand KPI : total 4 semaines
   const total4wCents = aggregate.reduce((sum, row) => sum + (row.total_revenue_cents ?? 0), 0);
@@ -92,6 +111,35 @@ export default async function AdminForecastPage() {
 
   const criticalCount = capacityAlerts.filter((a) => a.severity === 'critical').length;
   const warningCount = capacityAlerts.filter((a) => a.severity === 'warning').length;
+
+  // ---- Impact carburant plateforme (4 semaines) ----
+  // Estimation : chaque producteur actif fait 1 tournée/semaine × 200 km × 4 semaines
+  const ESTIMATED_TOUR_DISTANCE_M = 200_000;
+  const NUM_WEEKS = aggregate.length > 0 ? aggregate.length : 4;
+
+  let platformTotalCostEur = 0;
+  let platformTotalCo2Kg = 0;
+  let platformTotalSavingsEur = 0;
+  let platformTotalSavingsCo2Kg = 0;
+
+  for (const pv of producerVehicles) {
+    if (!pv.vehicle_fuel_type) continue;
+    const vc: VehicleConfig = {
+      fuel_type: pv.vehicle_fuel_type as VehicleConfig['fuel_type'],
+      consumption_l_per_100km: pv.vehicle_consumption_l_per_100km,
+      kwh_per_100km: pv.vehicle_kwh_per_100km,
+      custom_diesel_price_eur: pv.custom_diesel_price_eur,
+      custom_gasoline_price_eur: pv.custom_gasoline_price_eur,
+      custom_electric_price_eur: pv.custom_electric_price_eur,
+    };
+    const eco = calculateRouteEconomics(ESTIMATED_TOUR_DISTANCE_M, vc);
+    if (eco) {
+      platformTotalCostEur += eco.cost_eur * NUM_WEEKS;
+      platformTotalCo2Kg += eco.co2_kg * NUM_WEEKS;
+      platformTotalSavingsEur += eco.vs_naive.savings_eur * NUM_WEEKS;
+      platformTotalSavingsCo2Kg += eco.vs_naive.savings_co2_kg * NUM_WEEKS;
+    }
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -177,6 +225,56 @@ export default async function AdminForecastPage() {
           <p className="text-xs text-neutral-600 mt-1">{aggregate[0]?.entities_count ?? 0} entites</p>
         </div>
       </div>
+
+      {/* KPI Impact carburant plateforme */}
+      {platformTotalCostEur > 0 && (
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Fuel className="w-4 h-4 text-muted-foreground" />
+              Impact carburant plateforme — {NUM_WEEKS} semaines
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mb-4">
+              Estimé sur ~200 km/tournée/semaine par producteur ayant renseigné son véhicule ({producerVehicles.filter((p) => !!p.vehicle_fuel_type).length}/{producerVehicles.length} producteurs configurés).
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 px-4 py-3 bg-accent/10 border border-accent/20 rounded-xl">
+                <Fuel className="w-4 h-4 text-primary" />
+                <div>
+                  <p className="text-lg font-bold text-foreground">
+                    {platformTotalCostEur.toFixed(2).replace('.', ',')} €
+                  </p>
+                  <p className="text-xs text-muted-foreground">Carburant total estimé</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+                <Leaf className="w-4 h-4 text-green-500" />
+                <div>
+                  <p className="text-lg font-bold text-foreground">
+                    {Math.round(platformTotalCo2Kg * 10) / 10} kg
+                  </p>
+                  <p className="text-xs text-muted-foreground">CO₂ émis</p>
+                </div>
+              </div>
+              {platformTotalSavingsEur > 0 && (
+                <div className="flex items-center gap-2 px-4 py-3 bg-green-500/5 border border-green-500/10 rounded-xl">
+                  <TrendingDown className="w-4 h-4 text-green-500" />
+                  <div>
+                    <p className="text-lg font-bold text-green-400">
+                      {platformTotalSavingsEur.toFixed(2).replace('.', ',')} €
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Économie optimisation ({Math.round(platformTotalSavingsCo2Kg * 10) / 10} kg CO₂ évité)
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Tableau par semaine */}

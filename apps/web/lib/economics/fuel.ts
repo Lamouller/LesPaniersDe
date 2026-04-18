@@ -52,7 +52,7 @@ export function calculateRouteEconomics(
 ): RouteEconomics | null {
   const distance_km = distance_m / 1000;
 
-  if (v.fuel_type === 'none' || v.fuel_type === 'bike') {
+  if (v.fuel_type === 'none') {
     // Vélo ou sans carburant — coût nul
     const zero: RouteEconomics = {
       fuel_units: 0,
