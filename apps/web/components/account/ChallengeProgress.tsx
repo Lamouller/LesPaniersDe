@@ -28,18 +28,18 @@ export function ChallengeProgress({
   }).format(new Date(endDate));
 
   return (
-    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl p-6">
+    <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl shadow-xl p-6">
       <div className="flex items-start gap-3 mb-4">
         <div className="w-9 h-9 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center flex-shrink-0">
           <Target className="w-4 h-4 text-green-400" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
             Challenge en cours
           </p>
-          <h3 className="text-base font-semibold text-neutral-50">{title}</h3>
+          <h3 className="text-base font-semibold text-foreground">{title}</h3>
           {description && (
-            <p className="text-sm text-neutral-400 mt-1 leading-relaxed">{description}</p>
+            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{description}</p>
           )}
         </div>
       </div>
@@ -47,11 +47,11 @@ export function ChallengeProgress({
       {/* Progress bar */}
       <div className="mb-3">
         <div className="flex items-baseline justify-between mb-2">
-          <span className="text-2xl font-bold text-neutral-50">
+          <span className="text-2xl font-bold text-foreground">
             {currentValue}
-            <span className="text-base font-normal text-neutral-500 ml-1">/ {targetValue}</span>
+            <span className="text-base font-normal text-muted-foreground ml-1">/ {targetValue}</span>
           </span>
-          <span className="text-sm font-semibold text-neutral-400">{pct}%</span>
+          <span className="text-sm font-semibold text-muted-foreground">{pct}%</span>
         </div>
         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
           <div
@@ -63,7 +63,7 @@ export function ChallengeProgress({
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-neutral-500 mt-3">
+      <div className="flex items-center justify-between text-xs text-muted-foreground mt-3">
         <span>Jusqu&apos;au {endDateFormatted}</span>
         {completed && (
           <span className="text-green-400 font-semibold">Objectif atteint !</span>

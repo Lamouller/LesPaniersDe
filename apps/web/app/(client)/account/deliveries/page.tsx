@@ -14,7 +14,7 @@ const LiveDeliveryMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] h-52 flex items-center justify-center">
+      <div className="mt-4 rounded-xl border border-border bg-white/[0.02] h-52 flex items-center justify-center">
         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
       </div>
     ),
@@ -162,8 +162,8 @@ export default function DeliveriesPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">Retraits</p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Mes livraisons</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Retraits</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Mes livraisons</h1>
       </div>
 
       {/* En cours */}
@@ -179,8 +179,8 @@ export default function DeliveriesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-neutral-300 mb-1">{inProgress.producer_name}</p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-sm text-foreground/70 mb-1">{inProgress.producer_name}</p>
+            <p className="text-xs text-muted-foreground">
               Semaine du {formatDate(inProgress.week_start)}
             </p>
 
@@ -204,15 +204,15 @@ export default function DeliveriesPage() {
       {/* A venir */}
       {upcoming.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-neutral-400 mb-3">À venir</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">À venir</h2>
           <div className="space-y-3">
             {upcoming.map((d, idx) => (
               <Card key={d.delivery_id || idx}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-neutral-200">{d.producer_name}</p>
-                      <p className="text-xs text-neutral-500 mt-0.5">
+                      <p className="text-sm font-medium text-foreground/80">{d.producer_name}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Semaine du {formatDate(d.week_start)}
                       </p>
                     </div>
@@ -228,15 +228,15 @@ export default function DeliveriesPage() {
       {/* Terminés */}
       {completed.length > 0 && (
         <div>
-          <h2 className="text-sm font-semibold text-neutral-400 mb-3">Historique</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">Historique</h2>
           <div className="space-y-3">
             {completed.map((d, idx) => (
               <Card key={d.delivery_id || idx} className="opacity-70">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-neutral-300">{d.producer_name}</p>
-                      <p className="text-xs text-neutral-600 mt-0.5">
+                      <p className="text-sm font-medium text-foreground/70">{d.producer_name}</p>
+                      <p className="text-xs text-muted-foreground/60 mt-0.5">
                         Semaine du {formatDate(d.week_start)}
                       </p>
                     </div>

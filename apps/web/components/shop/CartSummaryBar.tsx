@@ -22,23 +22,23 @@ export default function CartSummaryBar({ disabled = false }: Props) {
   return (
     <div className="fixed bottom-20 md:bottom-6 inset-x-4 z-10">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between px-5 py-4 bg-neutral-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl">
+        <div className="flex items-center justify-between px-5 py-4 bg-background/90 backdrop-blur-2xl border border-border rounded-2xl shadow-2xl">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-white text-black flex items-center justify-center">
               <ShoppingBasket className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-neutral-50">
+              <p className="text-sm font-semibold text-foreground">
                 {count} {count > 1 ? 'produits' : 'produit'}
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-muted-foreground">
                 {lines.length} {lines.length > 1 ? 'références' : 'référence'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-base font-bold text-neutral-50">{formatCents(total)}</span>
+            <span className="text-base font-bold text-foreground">{formatCents(total)}</span>
             <button
               type="button"
               onClick={() => router.push('/shop/checkout')}

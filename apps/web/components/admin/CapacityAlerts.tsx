@@ -60,7 +60,7 @@ export function CapacityAlerts({ alerts }: CapacityAlertsProps) {
 
   if (filteredAlerts.length === 0) {
     return (
-      <p className="text-sm text-neutral-600 py-2">Aucune alerte capacité pour le moment.</p>
+      <p className="text-sm text-muted-foreground py-2">Aucune alerte capacité pour le moment.</p>
     );
   }
 
@@ -78,12 +78,12 @@ export function CapacityAlerts({ alerts }: CapacityAlertsProps) {
             <IconComponent className={`w-5 h-5 flex-shrink-0 mt-0.5 ${cfg.iconColor}`} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-semibold text-neutral-200">{alert.producer_name}</span>
+                <span className="text-sm font-semibold text-foreground/80">{alert.producer_name}</span>
                 <Badge variant={cfg.badgeVariant} className="text-[10px]">
                   {cfg.label}
                 </Badge>
               </div>
-              <p className="text-xs text-neutral-400 mb-1">
+              <p className="text-xs text-muted-foreground mb-1">
                 Semaine du {formatDate(alert.week_start)} — {alert.current_orders}/{alert.max_orders} commandes ({alert.fill_pct}%)
               </p>
               <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-2">
@@ -98,7 +98,7 @@ export function CapacityAlerts({ alerts }: CapacityAlertsProps) {
                   style={{ width: `${Math.min(alert.fill_pct, 100)}%` }}
                 />
               </div>
-              <p className="text-xs text-neutral-500">{cfg.recommendation}</p>
+              <p className="text-xs text-muted-foreground">{cfg.recommendation}</p>
             </div>
           </div>
         );

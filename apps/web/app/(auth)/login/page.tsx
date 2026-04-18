@@ -97,7 +97,7 @@ export default function LoginPage() {
           <div className="space-y-1.5">
             <Label htmlFor="email">Adresse e-mail</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
                 id="email"
                 type="email"
@@ -113,7 +113,7 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <Label htmlFor="password">Mot de passe</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <Input
                   id="password"
                   type="password"
@@ -146,7 +146,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setMode(mode === 'password' ? 'magic' : 'password')}
-            className="w-full text-sm text-neutral-500 hover:text-neutral-300 transition-colors text-center"
+            className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors text-center"
           >
             {mode === 'password'
               ? 'Connexion par lien magique (sans mot de passe)'
@@ -154,11 +154,11 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-white/10 flex justify-between text-sm text-neutral-500">
-          <Link href="/register" className="hover:text-neutral-300 transition-colors">
+        <div className="mt-6 pt-4 border-t border-border flex justify-between text-sm text-muted-foreground">
+          <Link href="/register" className="hover:text-foreground transition-colors">
             Créer un compte
           </Link>
-          <Link href="/forgot-password" className="hover:text-neutral-300 transition-colors">
+          <Link href="/forgot-password" className="hover:text-foreground transition-colors">
             Mot de passe oublié ?
           </Link>
         </div>

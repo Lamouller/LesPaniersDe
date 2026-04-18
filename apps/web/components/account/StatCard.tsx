@@ -12,7 +12,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, sublabel, icon, accent = 'default', className }: StatCardProps) {
   const accentMap = {
-    default: 'text-neutral-50',
+    default: 'text-foreground',
     green: 'text-green-400',
     amber: 'text-amber-400',
     blue: 'text-blue-400',
@@ -26,18 +26,18 @@ export function StatCard({ label, value, sublabel, icon, accent = 'default', cla
       )}
     >
       {icon && (
-        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-white/5 border border-border flex items-center justify-center flex-shrink-0">
           {icon}
         </div>
       )}
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
         {label}
       </p>
       <p className={cn('text-3xl font-bold tracking-tight leading-tight', accentMap[accent])}>
         {value}
       </p>
       {sublabel && (
-        <p className="text-xs text-neutral-500 leading-normal">{sublabel}</p>
+        <p className="text-xs text-muted-foreground leading-normal">{sublabel}</p>
       )}
     </div>
   );

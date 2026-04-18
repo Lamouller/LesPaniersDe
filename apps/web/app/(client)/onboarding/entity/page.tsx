@@ -61,23 +61,23 @@ export default function OnboardingEntityPage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg animate-fade-in">
         <div className="text-center mb-8">
-          <div className="inline-flex w-14 h-14 rounded-2xl bg-white/5 border border-white/10 items-center justify-center mb-4">
-            <Building2 className="w-7 h-7 text-neutral-300" />
+          <div className="inline-flex w-14 h-14 rounded-2xl bg-white/5 border border-border items-center justify-center mb-4">
+            <Building2 className="w-7 h-7 text-foreground/70" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-50 mb-2">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground mb-2">
             Choisissez votre lieu de retrait
           </h1>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-muted-foreground">
             Sélectionnez l'entité où vous récupérez vos paniers chaque semaine.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <Input
             type="text"
             placeholder="Rechercher par nom ou ville..."
@@ -90,7 +90,7 @@ export default function OnboardingEntityPage() {
         {/* Entity list */}
         <div className="space-y-2 max-h-72 overflow-y-auto mb-6 pr-1">
           {filtered.length === 0 && (
-            <p className="text-center text-sm text-neutral-600 py-8">Aucune entité trouvée</p>
+            <p className="text-center text-sm text-muted-foreground/60 py-8">Aucune entité trouvée</p>
           )}
           {filtered.map((entity) => (
             <button
@@ -99,8 +99,8 @@ export default function OnboardingEntityPage() {
               onClick={() => setSelected(entity)}
               className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 ${
                 selected?.id === entity.id
-                  ? 'bg-white/10 border-white/30 text-neutral-50'
-                  : 'bg-white/[0.03] border-white/10 text-neutral-400 hover:bg-white/5 hover:text-neutral-200'
+                  ? 'bg-white/10 border-white/30 text-foreground'
+                  : 'bg-white/[0.03] border-border text-muted-foreground hover:bg-white/5 hover:text-foreground/80'
               }`}
             >
               <p className="text-sm font-medium">{entity.name}</p>
@@ -134,8 +134,8 @@ export default function OnboardingEntityPage() {
         </Button>
 
         {selected && (
-          <p className="text-center text-xs text-neutral-600 mt-3">
-            Sélectionné : <span className="text-neutral-400">{selected.name}</span>
+          <p className="text-center text-xs text-muted-foreground/60 mt-3">
+            Sélectionné : <span className="text-muted-foreground">{selected.name}</span>
           </p>
         )}
       </div>

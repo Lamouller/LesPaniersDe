@@ -132,10 +132,10 @@ export default async function CommunityPage() {
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
           Communauté
         </p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">{entityName}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">{entityName}</h1>
       </div>
 
       {/* Challenge actif */}
@@ -153,25 +153,25 @@ export default async function CommunityPage() {
       {/* Progression collective */}
       {progress && (
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-neutral-300">Progression collective</h2>
+          <h2 className="text-base font-semibold text-foreground/70">Progression collective</h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             <StatCard
               label="Cette semaine"
               value={String(progress.current_week_orders)}
               sublabel="paniers retirés"
-              icon={<ShoppingBasket className="w-4 h-4 text-neutral-400" />}
+              icon={<ShoppingBasket className="w-4 h-4 text-muted-foreground" />}
             />
             <StatCard
               label="Ce mois"
               value={String(progress.current_month_orders)}
               sublabel="paniers retirés"
-              icon={<Calendar className="w-4 h-4 text-neutral-400" />}
+              icon={<Calendar className="w-4 h-4 text-muted-foreground" />}
             />
             <StatCard
               label="Tout temps"
               value={String(progress.total_all_time_orders)}
               sublabel="paniers au total"
-              icon={<Users className="w-4 h-4 text-neutral-400" />}
+              icon={<Users className="w-4 h-4 text-muted-foreground" />}
               className="col-span-2 sm:col-span-1"
             />
           </div>
@@ -180,12 +180,12 @@ export default async function CommunityPage() {
 
       {/* Leaderboard */}
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-neutral-300">Classement</h2>
+        <h2 className="text-base font-semibold text-foreground/70">Classement</h2>
 
         {!isOptIn && (
-          <div className="flex items-start gap-3 px-4 py-3.5 bg-white/[0.03] border border-white/[0.07] rounded-xl">
+          <div className="flex items-start gap-3 px-4 py-3.5 bg-white/[0.03] border border-border rounded-xl">
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-neutral-400 leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Tu n&apos;apparais pas dans le classement.
               </p>
             </div>
@@ -203,7 +203,7 @@ export default async function CommunityPage() {
         {/* Own rank if opt-in and outside top 10 */}
         {isOptIn && !userInTop && userOwnRow && (
           <div className="mt-2">
-            <p className="text-xs text-neutral-500 mb-2 text-center">Votre position</p>
+            <p className="text-xs text-muted-foreground mb-2 text-center">Votre position</p>
             <LeaderboardTable
               rows={[{
                 user_id: userOwnRow.user_id,

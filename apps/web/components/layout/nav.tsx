@@ -38,9 +38,9 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
   const links = role ? roleLinks[role] : [];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 md:px-6 h-14 bg-neutral-950/80 backdrop-blur-xl border-b border-white/10">
+    <header className="fixed top-0 inset-x-0 z-40 flex items-center justify-between px-4 md:px-6 h-14 bg-background/80 backdrop-blur-xl border-b border-border">
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 text-neutral-50 font-bold text-lg tracking-tight">
+      <Link href="/" className="flex items-center gap-2 text-foreground font-bold text-lg tracking-tight">
         <span className="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center font-bold text-xs">LP</span>
         <span className="hidden sm:inline">LesPaniersDe</span>
       </Link>
@@ -51,7 +51,7 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
           <Link
             key={link.href}
             href={link.href}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
           >
             {link.icon}
             {link.label}
@@ -65,7 +65,7 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
         <button
           type="button"
           onClick={onLocaleToggle}
-          className="p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+          className="p-2 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
           aria-label="Changer de langue"
         >
           <Globe className="w-4 h-4" />
@@ -75,7 +75,7 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
         <button
           type="button"
           onClick={onThemeToggle}
-          className="p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+          className="p-2 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
           aria-label="Changer de thème"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -91,7 +91,7 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+          className="md:hidden p-2 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
           aria-label={mobileOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
         >
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -100,13 +100,13 @@ export function Nav({ role, locale: _locale = 'fr', theme = 'dark', onThemeToggl
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="absolute top-14 inset-x-0 bg-neutral-950/95 backdrop-blur-xl border-b border-white/10 p-4 flex flex-col gap-1 md:hidden animate-slide-up">
+        <div className="absolute top-14 inset-x-0 bg-background/95 backdrop-blur-xl border-b border-border p-4 flex flex-col gap-1 md:hidden animate-slide-up">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+              className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-muted-foreground hover:bg-white/5 hover:text-foreground transition-all duration-200"
             >
               {link.icon}
               {link.label}

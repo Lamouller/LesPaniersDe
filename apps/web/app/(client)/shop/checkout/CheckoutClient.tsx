@@ -32,10 +32,10 @@ export default function CheckoutClient({
   if (lines.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-neutral-400 text-sm mb-4">Votre panier est vide.</p>
+        <p className="text-muted-foreground text-sm mb-4">Votre panier est vide.</p>
         <Link
           href="/shop"
-          className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-neutral-50 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour à la boutique
@@ -94,13 +94,13 @@ export default function CheckoutClient({
         <Link href="/shop">
           <button
             type="button"
-            className="p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+            className="p-2 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground/80 transition-all duration-200"
             aria-label="Retour"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Récapitulatif</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Récapitulatif</h1>
       </div>
 
       {/* Cart lines */}
@@ -113,21 +113,21 @@ export default function CheckoutClient({
             {lines.map((line) => (
               <div
                 key={line.product_id}
-                className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
+                className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
               >
                 <div>
-                  <p className="text-sm font-medium text-neutral-200">{line.product_name}</p>
-                  <p className="text-xs text-neutral-500">×{line.quantity}</p>
+                  <p className="text-sm font-medium text-foreground/80">{line.product_name}</p>
+                  <p className="text-xs text-muted-foreground">×{line.quantity}</p>
                 </div>
-                <span className="text-sm font-semibold text-neutral-50">
+                <span className="text-sm font-semibold text-foreground">
                   {formatCents(line.unit_price_cents * line.quantity)}
                 </span>
               </div>
             ))}
 
             <div className="flex items-center justify-between pt-3">
-              <p className="text-base font-semibold text-neutral-50">Total</p>
-              <span className="text-lg font-bold text-neutral-50">{formatCents(total)}</span>
+              <p className="text-base font-semibold text-foreground">Total</p>
+              <span className="text-lg font-bold text-foreground">{formatCents(total)}</span>
             </div>
           </div>
         </CardContent>
@@ -137,17 +137,17 @@ export default function CheckoutClient({
       <Card className="mb-6">
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-neutral-400 flex-shrink-0 mt-0.5" />
+            <MapPin className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-semibold text-neutral-200">
+              <p className="text-sm font-semibold text-foreground/80">
                 Retrait : {entityName}
               </p>
-              <p className="text-sm text-neutral-400 mt-1">{pickupAddress}</p>
+              <p className="text-sm text-muted-foreground mt-1">{pickupAddress}</p>
               {pickupInstructions && (
-                <p className="text-xs text-neutral-500 mt-1">{pickupInstructions}</p>
+                <p className="text-xs text-muted-foreground mt-1">{pickupInstructions}</p>
               )}
               {deliveryInfo && (
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Livraison prévue : {deliveryInfo}
                 </p>
               )}
@@ -170,14 +170,14 @@ export default function CheckoutClient({
 
       {/* Notes */}
       <div className="mb-8 space-y-1.5">
-        <label className="text-sm font-medium text-neutral-300">
+        <label className="text-sm font-medium text-foreground/70">
           Notes pour le producteur (optionnel)
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Ex : allergie à la courgette, livrez en bas de l'immeuble..."
-          className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-y min-h-[80px]"
+          className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-2xl text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-y min-h-[80px]"
         />
       </div>
 
@@ -205,7 +205,7 @@ export default function CheckoutClient({
         )}
       </button>
 
-      <p className="text-center text-xs text-neutral-600 mt-4">
+      <p className="text-center text-xs text-muted-foreground/60 mt-4">
         Vous pouvez contacter le producteur si vous devez annuler.
       </p>
     </div>

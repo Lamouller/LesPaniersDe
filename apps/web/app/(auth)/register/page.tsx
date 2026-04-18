@@ -82,7 +82,7 @@ export default function RegisterPage() {
           <div className="space-y-1.5">
             <Label htmlFor="email">Adresse e-mail</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input id="email" type="email" placeholder="vous@exemple.fr" className="pl-9" {...register('email')} />
             </div>
             {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
@@ -91,7 +91,7 @@ export default function RegisterPage() {
           <div className="space-y-1.5">
             <Label htmlFor="password">Mot de passe</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input id="password" type="password" placeholder="••••••••" className="pl-9" {...register('password')} />
             </div>
             {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
@@ -100,10 +100,10 @@ export default function RegisterPage() {
           <div className="space-y-1.5">
             <Label htmlFor="entity_id">Votre lieu de retrait</Label>
             <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <select
                 id="entity_id"
-                className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 appearance-none"
+                className="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 appearance-none"
                 {...register('entity_id')}
               >
                 <option value="" className="bg-neutral-900">Sélectionnez votre entité</option>
@@ -124,13 +124,13 @@ export default function RegisterPage() {
               className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 text-white focus:ring-white/20"
               {...register('gdpr')}
             />
-            <Label htmlFor="gdpr" className="text-xs text-neutral-400 font-normal leading-relaxed cursor-pointer">
+            <Label htmlFor="gdpr" className="text-xs text-muted-foreground font-normal leading-relaxed cursor-pointer">
               J'accepte les{' '}
-              <Link href="/legal/terms" className="text-neutral-200 hover:underline">
+              <Link href="/legal/terms" className="text-foreground/80 hover:underline">
                 conditions générales
               </Link>{' '}
               et la{' '}
-              <Link href="/legal/privacy" className="text-neutral-200 hover:underline">
+              <Link href="/legal/privacy" className="text-foreground/80 hover:underline">
                 politique de confidentialité
               </Link>{' '}
               (RGPD)
@@ -156,9 +156,9 @@ export default function RegisterPage() {
           </Button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-white/10 text-center text-sm text-neutral-500">
+        <div className="mt-6 pt-4 border-t border-border text-center text-sm text-muted-foreground">
           Déjà un compte ?{' '}
-          <Link href="/login" className="text-neutral-300 hover:text-neutral-50 transition-colors">
+          <Link href="/login" className="text-foreground/70 hover:text-foreground transition-colors">
             Se connecter
           </Link>
         </div>

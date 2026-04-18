@@ -74,8 +74,8 @@ export default function PreferencesPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">Compte</p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Préférences</h1>
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Compte</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Préférences</h1>
       </div>
 
       {/* Allergies */}
@@ -92,9 +92,9 @@ export default function PreferencesPage() {
             value={allergies}
             onChange={(e) => setAllergies(e.target.value)}
             placeholder="Ex: gluten, lactose, arachides..."
-            className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-none min-h-[80px]"
+            className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-none min-h-[80px]"
           />
-          <p className="text-xs text-neutral-600 mt-1.5">
+          <p className="text-xs text-muted-foreground/60 mt-1.5">
             Ces informations sont partagées avec le producteur pour adapter votre commande.
           </p>
         </CardContent>
@@ -104,7 +104,7 @@ export default function PreferencesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Bell className="w-4 h-4 text-neutral-400" />
+            <Bell className="w-4 h-4 text-muted-foreground" />
             Canaux de notification
           </CardTitle>
         </CardHeader>
@@ -117,12 +117,12 @@ export default function PreferencesPage() {
             ].map((item) => (
               <div key={item.id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
-                    <item.icon className="w-4 h-4 text-neutral-400" />
+                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-border flex items-center justify-center">
+                    <item.icon className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-neutral-200">{item.label}</p>
-                    <p className="text-xs text-neutral-600">{item.sublabel}</p>
+                    <p className="text-sm font-medium text-foreground/80">{item.label}</p>
+                    <p className="text-xs text-muted-foreground/60">{item.sublabel}</p>
                   </div>
                 </div>
                 <button
@@ -150,7 +150,7 @@ export default function PreferencesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="w-4 h-4 text-neutral-400" />
+            <Users className="w-4 h-4 text-muted-foreground" />
             Communauté
           </CardTitle>
         </CardHeader>
@@ -158,8 +158,8 @@ export default function PreferencesPage() {
           {/* Toggle opt-in */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-neutral-200">Participer au classement</p>
-              <p className="text-xs text-neutral-600 mt-0.5 leading-relaxed">
+              <p className="text-sm font-medium text-foreground/80">Participer au classement</p>
+              <p className="text-xs text-muted-foreground/60 mt-0.5 leading-relaxed">
                 Votre pseudo sera visible dans le classement de votre espace. Vous pouvez vous
                 désinscrire à tout moment (consentement RGPD).
               </p>
@@ -184,7 +184,7 @@ export default function PreferencesPage() {
           {/* Public display name (visible only when opt-in) */}
           {leaderboardOptIn && (
             <div className="space-y-1.5">
-              <label htmlFor="public_display_name" className="text-sm font-medium text-neutral-300 block">
+              <label htmlFor="public_display_name" className="text-sm font-medium text-foreground/70 block">
                 Pseudo public
               </label>
               <input
@@ -194,9 +194,9 @@ export default function PreferencesPage() {
                 onChange={(e) => setPublicDisplayName(e.target.value)}
                 placeholder="Ex: Alice veggie"
                 maxLength={40}
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20"
               />
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-muted-foreground">
                 Ce pseudo remplace votre nom dans le classement.
               </p>
             </div>

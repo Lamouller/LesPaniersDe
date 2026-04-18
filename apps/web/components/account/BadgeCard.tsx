@@ -81,11 +81,11 @@ export function BadgeCard({ code, awardedAt, unlocked }: BadgeCardProps) {
     return (
       <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 flex items-start gap-3 opacity-40">
         <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/[0.07] flex items-center justify-center flex-shrink-0">
-          <Icon className="w-4 h-4 text-neutral-600" />
+          <Icon className="w-4 h-4 text-muted-foreground/60" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-neutral-500">{meta.title}</p>
-          <p className="text-xs text-neutral-600 mt-0.5">{meta.description}</p>
+          <p className="text-sm font-medium text-muted-foreground">{meta.title}</p>
+          <p className="text-xs text-muted-foreground/60 mt-0.5">{meta.description}</p>
         </div>
       </div>
     );
@@ -93,14 +93,14 @@ export function BadgeCard({ code, awardedAt, unlocked }: BadgeCardProps) {
 
   return (
     <div className="bg-white/[0.03] backdrop-blur-lg border border-white/[0.07] rounded-xl p-4 flex items-start gap-3 shadow-lg">
-      <div className={cn('w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0')}>
+      <div className={cn('w-9 h-9 rounded-lg bg-white/5 border border-border flex items-center justify-center flex-shrink-0')}>
         <Icon className={cn('w-4 h-4', meta.color)} />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-neutral-100">{meta.title}</p>
-        <p className="text-xs text-neutral-400 mt-0.5">{meta.description}</p>
+        <p className="text-sm font-semibold text-foreground">{meta.title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{meta.description}</p>
         {awardedAt && (
-          <p className="text-[10px] text-neutral-600 mt-1">Obtenu le {formatDate(awardedAt)}</p>
+          <p className="text-[10px] text-muted-foreground/60 mt-1">Obtenu le {formatDate(awardedAt)}</p>
         )}
       </div>
     </div>

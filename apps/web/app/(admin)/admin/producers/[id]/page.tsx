@@ -212,7 +212,7 @@ export default function AdminProducerDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8 text-center text-sm text-neutral-500">
+      <div className="max-w-3xl mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
         Chargement...
       </div>
     );
@@ -229,80 +229,80 @@ export default function AdminProducerDetailPage() {
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
-        <Tractor className="w-5 h-5 text-neutral-400" />
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">
+        <Tractor className="w-5 h-5 text-muted-foreground" />
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {isNew ? 'Nouveau producteur' : 'Modifier le producteur'}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Informations générales */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">Informations générales</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">Informations générales</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Nom *</label>
+              <label className="text-sm font-medium text-foreground/70">Nom *</label>
               <input
                 {...register('name')}
                 type="text"
                 placeholder="La Ferme des Collines"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Slug *</label>
+              <label className="text-sm font-medium text-foreground/70">Slug *</label>
               <input
                 {...register('slug')}
                 type="text"
                 placeholder="la-ferme-des-collines"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 font-mono focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.slug && <p className="text-xs text-red-400">{errors.slug.message}</p>}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">Bio</label>
+            <label className="text-sm font-medium text-foreground/70">Bio</label>
             <textarea
               {...register('bio')}
               rows={3}
               placeholder="Description du producteur..."
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">URL photo</label>
+            <label className="text-sm font-medium text-foreground/70">URL photo</label>
             <input
               {...register('photo_url')}
               type="url"
               placeholder="https://..."
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
             />
             {errors.photo_url && <p className="text-xs text-red-400">{errors.photo_url.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Email contact</label>
+              <label className="text-sm font-medium text-foreground/70">Email contact</label>
               <input
                 {...register('contact_email')}
                 type="email"
                 placeholder="ferme@example.fr"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.contact_email && <p className="text-xs text-red-400">{errors.contact_email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Téléphone</label>
+              <label className="text-sm font-medium text-foreground/70">Téléphone</label>
               <input
                 {...register('contact_phone')}
                 type="text"
                 placeholder="+33 6 ..."
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
           </div>
@@ -314,50 +314,50 @@ export default function AdminProducerDetailPage() {
               id="prod_is_active"
               className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer"
             />
-            <label htmlFor="prod_is_active" className="text-sm text-neutral-300 cursor-pointer">
+            <label htmlFor="prod_is_active" className="text-sm text-foreground/70 cursor-pointer">
               Producteur actif
             </label>
           </div>
         </div>
 
         {/* Paiement */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">Paramètres paiement</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">Paramètres paiement</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Délai commande (h)</label>
+              <label className="text-sm font-medium text-foreground/70">Délai commande (h)</label>
               <input
                 {...register('default_order_deadline_hours')}
                 type="number"
                 min={1}
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Relance après (j)</label>
+              <label className="text-sm font-medium text-foreground/70">Relance après (j)</label>
               <input
                 {...register('payment_reminder_days')}
                 type="number"
                 min={1}
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Blocage après (j)</label>
+              <label className="text-sm font-medium text-foreground/70">Blocage après (j)</label>
               <input
                 {...register('payment_block_days')}
                 type="number"
                 min={1}
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
           </div>
         </div>
 
         {/* WhatsApp */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">WhatsApp Business</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">WhatsApp Business</h2>
 
           <div className="flex items-center gap-3">
             <input
@@ -366,7 +366,7 @@ export default function AdminProducerDetailPage() {
               id="whatsapp_enabled"
               className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer"
             />
-            <label htmlFor="whatsapp_enabled" className="text-sm text-neutral-300 cursor-pointer">
+            <label htmlFor="whatsapp_enabled" className="text-sm text-foreground/70 cursor-pointer">
               Activer WhatsApp
             </label>
           </div>
@@ -374,25 +374,25 @@ export default function AdminProducerDetailPage() {
           {whatsappEnabled && (
             <div className="space-y-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-neutral-300">Phone ID</label>
+                <label className="text-sm font-medium text-foreground/70">Phone ID</label>
                 <input
                   {...register('whatsapp_phone_id')}
                   type="text"
                   placeholder="123456789012345"
-                  className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                  className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-neutral-300">
-                  Access Token <span className="text-neutral-600 font-normal">(chiffré au stockage)</span>
+                <label className="text-sm font-medium text-foreground/70">
+                  Access Token <span className="text-muted-foreground/60 font-normal">(chiffré au stockage)</span>
                 </label>
                 <input
                   {...register('whatsapp_access_token')}
                   type="password"
                   placeholder="EAABxx..."
-                  className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 font-mono placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                  className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground font-mono placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
                 />
-                <p className="text-xs text-neutral-600">Laisser vide pour conserver l&apos;existant.</p>
+                <p className="text-xs text-muted-foreground/60">Laisser vide pour conserver l&apos;existant.</p>
               </div>
             </div>
           )}
@@ -400,18 +400,18 @@ export default function AdminProducerDetailPage() {
 
         {/* Entités servies (seulement si édition) */}
         {!isNew && (
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-sm font-semibold text-neutral-300 mb-4">Entités servies</h2>
+          <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl">
+            <h2 className="text-sm font-semibold text-foreground/70 mb-4">Entités servies</h2>
 
             {producerLinks.length === 0 ? (
-              <p className="text-sm text-neutral-600 mb-4">Aucune entité associée.</p>
+              <p className="text-sm text-muted-foreground/60 mb-4">Aucune entité associée.</p>
             ) : (
               <div className="space-y-2 mb-4">
                 {producerLinks.map((link) => (
-                  <div key={link.entity_id} className="flex items-center justify-between py-2.5 px-3 bg-white/[0.03] border border-white/5 rounded-xl">
+                  <div key={link.entity_id} className="flex items-center justify-between py-2.5 px-3 bg-white/[0.03] border border-border/50 rounded-xl">
                     <div>
-                      <p className="text-sm text-neutral-200">{link.entity_name}</p>
-                      <p className="text-xs text-neutral-600">
+                      <p className="text-sm text-foreground/80">{link.entity_name}</p>
+                      <p className="text-xs text-muted-foreground/60">
                         {link.delivery_day !== null ? DAYS[link.delivery_day] ?? `Jour ${link.delivery_day}` : 'Jour non défini'}
                         {link.time_from && link.time_to ? ` · ${link.time_from}–${link.time_to}` : ''}
                       </p>
@@ -423,7 +423,7 @@ export default function AdminProducerDetailPage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveEntity(link.entity_id)}
-                        className="p-1.5 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-colors"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -438,7 +438,7 @@ export default function AdminProducerDetailPage() {
                 <select
                   value={addEntityId}
                   onChange={(e) => setAddEntityId(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+                  className="flex-1 px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
                 >
                   <option value="">Ajouter une entité...</option>
                   {availableEntities.map((e) => (

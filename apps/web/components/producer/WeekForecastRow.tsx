@@ -34,13 +34,13 @@ function formatEur(cents: number): string {
 
 function SizeBadges({ sizes }: { sizes: Record<string, number> }) {
   const entries = Object.entries(sizes).filter(([, v]) => v > 0);
-  if (!entries.length) return <span className="text-neutral-600 text-xs">—</span>;
+  if (!entries.length) return <span className="text-muted-foreground/60 text-xs">—</span>;
   return (
     <div className="flex gap-1 flex-wrap">
       {entries.map(([size, count]) => (
         <span
           key={size}
-          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-medium text-neutral-300"
+          className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white/5 border border-border text-[10px] font-medium text-foreground/70"
         >
           {size}&nbsp;×{count}
         </span>
@@ -79,11 +79,11 @@ export function WeekForecastRow({
         <td className="px-4 py-3">
           <div className="flex items-center gap-2">
             {open ? (
-              <ChevronDown className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-            <span className="text-sm font-medium text-neutral-200">{weekLabel}</span>
+            <span className="text-sm font-medium text-foreground/80">{weekLabel}</span>
             {weekOffset === 0 && (
               <Badge variant={weekBadgeVariant} className="text-[10px]">
                 En cours
@@ -97,7 +97,7 @@ export function WeekForecastRow({
         <td className="px-4 py-3 text-sm font-medium text-blue-300">
           {formatEur(projectedCents)}
         </td>
-        <td className="px-4 py-3 text-sm font-bold text-neutral-50">
+        <td className="px-4 py-3 text-sm font-bold text-foreground">
           {formatEur(totalCents)}
         </td>
         <td className="px-4 py-3 hidden lg:table-cell">
@@ -106,7 +106,7 @@ export function WeekForecastRow({
         <td className="px-4 py-3 hidden lg:table-cell">
           <SizeBadges sizes={projectedBasketsBySize} />
         </td>
-        <td className="px-4 py-3 text-xs text-neutral-400">
+        <td className="px-4 py-3 text-xs text-muted-foreground">
           {confirmedOrdersCount + projectedOrdersCount}
         </td>
       </tr>
@@ -114,7 +114,7 @@ export function WeekForecastRow({
       {open && entityDetails.length > 0 && (
         <tr className="border-b border-white/5 bg-white/[0.02]">
           <td colSpan={7} className="px-6 py-4">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
               Répartition par entité
             </p>
             <div className="space-y-2">
@@ -124,14 +124,14 @@ export function WeekForecastRow({
                   className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
                 >
                   <div>
-                    <p className="text-sm font-medium text-neutral-200">{entity.entity_name}</p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
+                    <p className="text-sm font-medium text-foreground/80">{entity.entity_name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {entity.confirmed_orders_count} confirmée(s) + {entity.projected_orders_count} projetée(s)
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <SizeBadges sizes={entity.baskets_mix_confirmed} />
-                    <span className="text-sm font-semibold text-neutral-300 ml-2">
+                    <span className="text-sm font-semibold text-foreground/70 ml-2">
                       {formatEur(entity.total_cents)}
                     </span>
                   </div>
@@ -144,7 +144,7 @@ export function WeekForecastRow({
 
       {open && entityDetails.length === 0 && (
         <tr className="border-b border-white/5 bg-white/[0.02]">
-          <td colSpan={7} className="px-6 py-3 text-sm text-neutral-600">
+          <td colSpan={7} className="px-6 py-3 text-sm text-muted-foreground/60">
             Aucune entité pour cette semaine.
           </td>
         </tr>

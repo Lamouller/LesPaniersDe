@@ -65,10 +65,10 @@ export default async function StatsPage() {
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
           Mon compte
         </p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Tes stats</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Tes stats</h1>
       </div>
 
       {/* Stat grid */}
@@ -77,14 +77,14 @@ export default async function StatsPage() {
           label="Paniers commandés"
           value={String(totalBaskets)}
           sublabel={sinceLabel ?? 'Aucune commande pour l\'instant'}
-          icon={<ShoppingBasket className="w-4 h-4 text-neutral-400" />}
+          icon={<ShoppingBasket className="w-4 h-4 text-muted-foreground" />}
           className="col-span-2 sm:col-span-1"
         />
         <StatCard
           label="Total dépensé"
           value={formatCents(totalSpent)}
           sublabel="En paniers retirés"
-          icon={<TrendingUp className="w-4 h-4 text-neutral-400" />}
+          icon={<TrendingUp className="w-4 h-4 text-muted-foreground" />}
         />
         <StatCard
           label="Économies estimées"
@@ -106,7 +106,7 @@ export default async function StatsPage() {
       {/* Badges obtenus */}
       {unlockedBadges.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-neutral-300">Mes badges</h2>
+          <h2 className="text-base font-semibold text-foreground/70">Mes badges</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {unlockedBadges.map((code) => {
               const badge = earnedBadges.find((b) => b.badge_code === code);
@@ -126,7 +126,7 @@ export default async function StatsPage() {
       {/* Badges à débloquer */}
       {lockedBadges.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-base font-semibold text-neutral-500">À débloquer</h2>
+          <h2 className="text-base font-semibold text-muted-foreground">À débloquer</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {lockedBadges.map((code) => (
               <BadgeCard key={code} code={code} unlocked={false} />
@@ -138,12 +138,12 @@ export default async function StatsPage() {
       {/* Link to community */}
       <Link
         href="/account/community"
-        className="flex items-center justify-between px-4 py-3.5 bg-white/[0.03] border border-white/[0.07] rounded-xl hover:bg-white/[0.06] hover:border-white/10 transition-all duration-200 group"
+        className="flex items-center justify-between px-4 py-3.5 bg-white/[0.03] border border-border rounded-xl hover:bg-white/[0.06] hover:border-border/70 transition-all duration-200 group"
       >
-        <span className="text-sm font-medium text-neutral-300 group-hover:text-neutral-100 transition-colors">
+        <span className="text-sm font-medium text-foreground/70 group-hover:text-foreground transition-colors">
           Voir la communauté
         </span>
-        <ChevronRight className="w-4 h-4 text-neutral-500 group-hover:text-neutral-300 transition-colors" />
+        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground/70 transition-colors" />
       </Link>
     </div>
   );

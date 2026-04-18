@@ -116,7 +116,7 @@ export default function AdminEntityDetailPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8 text-center text-sm text-neutral-500">
+      <div className="max-w-3xl mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
         Chargement...
       </div>
     );
@@ -130,47 +130,47 @@ export default function AdminEntityDetailPage() {
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
-        <Building2 className="w-5 h-5 text-neutral-400" />
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">
+        <Building2 className="w-5 h-5 text-muted-foreground" />
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
           {isNew ? 'Nouvelle entité' : 'Modifier l\'entité'}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">Informations générales</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">Informations générales</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Nom *</label>
+              <label className="text-sm font-medium text-foreground/70">Nom *</label>
               <input
                 {...register('name')}
                 type="text"
                 placeholder="Open Space du Centre"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.name && <p className="text-xs text-red-400">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Slug *</label>
+              <label className="text-sm font-medium text-foreground/70">Slug *</label>
               <input
                 {...register('slug')}
                 type="text"
                 placeholder="open-space-du-centre"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 font-mono focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.slug && <p className="text-xs text-red-400">{errors.slug.message}</p>}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">Description</label>
+            <label className="text-sm font-medium text-foreground/70">Description</label>
             <textarea
               {...register('description')}
               rows={2}
               placeholder="Description de l'entité..."
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
             />
           </div>
 
@@ -181,90 +181,90 @@ export default function AdminEntityDetailPage() {
               id="is_active"
               className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer"
             />
-            <label htmlFor="is_active" className="text-sm text-neutral-300 cursor-pointer">
+            <label htmlFor="is_active" className="text-sm text-foreground/70 cursor-pointer">
               Entité active (visible pour les clients)
             </label>
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">Adresses</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">Adresses</h2>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">Adresse postale</label>
+            <label className="text-sm font-medium text-foreground/70">Adresse postale</label>
             <input
               {...register('address')}
               type="text"
               placeholder="12 rue des Entrepreneurs, 75011 Paris"
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">Lieu de retrait</label>
+            <label className="text-sm font-medium text-foreground/70">Lieu de retrait</label>
             <input
               {...register('pickup_address')}
               type="text"
               placeholder="Salle café, rez-de-chaussée"
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Latitude</label>
+              <label className="text-sm font-medium text-foreground/70">Latitude</label>
               <input
                 {...register('pickup_lat')}
                 type="number"
                 step="0.000001"
                 placeholder="48.8566"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Longitude</label>
+              <label className="text-sm font-medium text-foreground/70">Longitude</label>
               <input
                 {...register('pickup_lng')}
                 type="number"
                 step="0.000001"
                 placeholder="2.3522"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300">Instructions de retrait</label>
+            <label className="text-sm font-medium text-foreground/70">Instructions de retrait</label>
             <textarea
               {...register('pickup_instructions')}
               rows={3}
               placeholder="Récupérez votre panier le samedi entre 10h et 12h..."
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200 resize-none"
             />
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-sm font-semibold text-neutral-300 mb-4">Contact</h2>
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-6 shadow-xl space-y-4">
+          <h2 className="text-sm font-semibold text-foreground/70 mb-4">Contact</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Email</label>
+              <label className="text-sm font-medium text-foreground/70">Email</label>
               <input
                 {...register('contact_email')}
                 type="email"
                 placeholder="contact@entity.fr"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
               {errors.contact_email && <p className="text-xs text-red-400">{errors.contact_email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-neutral-300">Téléphone</label>
+              <label className="text-sm font-medium text-foreground/70">Téléphone</label>
               <input
                 {...register('contact_phone')}
                 type="text"
                 placeholder="+33 1 23 45 67 89"
-                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
+                className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 transition-all duration-200"
               />
             </div>
           </div>

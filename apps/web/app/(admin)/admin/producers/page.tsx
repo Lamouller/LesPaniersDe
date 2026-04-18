@@ -88,10 +88,10 @@ export default function AdminProducersPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <Tractor className="w-5 h-5 text-neutral-400" />
+          <Tractor className="w-5 h-5 text-muted-foreground" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Producteurs</h1>
-            <p className="text-sm text-neutral-500">{producers.length} producteurs</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Producteurs</h1>
+            <p className="text-sm text-muted-foreground">{producers.length} producteurs</p>
           </div>
         </div>
         <Link href="/admin/producers/new">
@@ -103,38 +103,38 @@ export default function AdminProducersPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-sm text-neutral-500">Chargement...</div>
+        <div className="text-center py-12 text-sm text-muted-foreground">Chargement...</div>
       ) : (
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-xl">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Nom</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Contact</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Entités</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Cmds S.</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">CA S.</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Statut</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
+              <tr className="border-b border-border">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nom</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Contact</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Entités</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Cmds S.</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">CA S.</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {producers.map((producer) => (
                 <tr key={producer.id} className="hover:bg-white/[0.03] transition-colors">
                   <td className="px-4 py-3">
-                    <p className="text-sm font-medium text-neutral-200">{producer.name}</p>
-                    <p className="text-xs text-neutral-600 font-mono">{producer.slug}</p>
+                    <p className="text-sm font-medium text-foreground/80">{producer.name}</p>
+                    <p className="text-xs text-muted-foreground/60 font-mono">{producer.slug}</p>
                   </td>
-                  <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">
+                  <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
                     {producer.contact_email ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-neutral-400 hidden lg:table-cell">
+                  <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
                     {producer.entity_count}
                   </td>
-                  <td className="px-4 py-3 text-sm text-neutral-400 hidden md:table-cell">
+                  <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
                     {producer.order_count}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-neutral-200 hidden lg:table-cell">
+                  <td className="px-4 py-3 text-sm font-medium text-foreground/80 hidden lg:table-cell">
                     {producer.revenue_cents > 0 ? formatCents(producer.revenue_cents) : '—'}
                   </td>
                   <td className="px-4 py-3">

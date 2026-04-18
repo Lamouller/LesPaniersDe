@@ -127,10 +127,10 @@ export default function AdminUsersPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
-        <Users className="w-5 h-5 text-neutral-400" />
+        <Users className="w-5 h-5 text-muted-foreground" />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Utilisateurs</h1>
-          <p className="text-sm text-neutral-500">{users.length} résultats</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Utilisateurs</h1>
+          <p className="text-sm text-muted-foreground">{users.length} résultats</p>
         </div>
       </div>
 
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
         <select
           value={filterRole}
           onChange={(e) => { setFilterRole(e.target.value as FilterRole); setPage(0); }}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
         >
           <option value="all">Tous les rôles</option>
           <option value="client">Clients</option>
@@ -150,7 +150,7 @@ export default function AdminUsersPage() {
         <select
           value={filterEntity}
           onChange={(e) => { setFilterEntity(e.target.value); setPage(0); }}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
         >
           <option value="">Toutes entités</option>
           {entities.map((e) => (
@@ -158,7 +158,7 @@ export default function AdminUsersPage() {
           ))}
         </select>
 
-        <label className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-400 cursor-pointer hover:border-white/20 transition-colors">
+        <label className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-muted-foreground cursor-pointer hover:border-white/20 transition-colors">
           <input
             type="checkbox"
             checked={filterBlocked}
@@ -169,37 +169,37 @@ export default function AdminUsersPage() {
         </label>
       </div>
 
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-xl">
         {loading ? (
-          <div className="px-6 py-12 text-center text-sm text-neutral-500">Chargement...</div>
+          <div className="px-6 py-12 text-center text-sm text-muted-foreground">Chargement...</div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Nom</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Rôle</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Entité</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Commandes</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Statut</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Inscrit le</th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
+                  <tr className="border-b border-border">
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nom</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Rôle</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Entité</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Commandes</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Inscrit le</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {users.map((user) => (
                     <tr key={user.id} className="hover:bg-white/[0.03] transition-colors">
-                      <td className="px-4 py-3 text-sm text-neutral-200 font-medium">
-                        {user.full_name ?? <span className="text-neutral-600 italic">—</span>}
+                      <td className="px-4 py-3 text-sm text-foreground/80 font-medium">
+                        {user.full_name ?? <span className="text-muted-foreground/60 italic">—</span>}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={roleVariant[user.role] ?? 'default'}>{user.role}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
                         {user.entity_name ?? '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-neutral-400 hidden lg:table-cell">
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">
                         {user.order_count}
                       </td>
                       <td className="px-4 py-3">
@@ -211,7 +211,7 @@ export default function AdminUsersPage() {
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400">actif</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-neutral-600 hidden lg:table-cell">
+                      <td className="px-4 py-3 text-sm text-muted-foreground/60 hidden lg:table-cell">
                         {formatDateShort(user.created_at)}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -240,8 +240,8 @@ export default function AdminUsersPage() {
             </div>
 
             {/* Pagination */}
-            <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between">
-              <p className="text-xs text-neutral-600">{users.length} résultats</p>
+            <div className="px-4 py-3 border-t border-border flex items-center justify-between">
+              <p className="text-xs text-muted-foreground/60">{users.length} résultats</p>
               <div className="flex gap-2">
                 <Button
                   type="button"

@@ -192,10 +192,10 @@ export default async function ProducerForecastPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
             Vision financière
           </p>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-50">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Prévisionnel — {ctx.producerName}
           </h1>
         </div>
@@ -250,26 +250,26 @@ export default async function ProducerForecastPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Semaine
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Confirmé
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Projeté
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                     Paniers confirmés
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden lg:table-cell">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                     Paniers projetés
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Nb cmd
                   </th>
                 </tr>
@@ -304,7 +304,7 @@ export default async function ProducerForecastPage() {
                 })}
                 {weeklyForecast.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-neutral-600">
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground/60">
                       Aucune donnée prévisionnelle.
                     </td>
                   </tr>
@@ -334,7 +334,7 @@ export default async function ProducerForecastPage() {
                 {envImpact4w.map((w) => (
                   <div
                     key={w.week_label}
-                    className="flex flex-col gap-1 p-3 rounded-xl bg-white/5 border border-white/10"
+                    className="flex flex-col gap-1 p-3 rounded-xl bg-white/5 border border-border"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                       {w.week_label}
@@ -358,7 +358,7 @@ export default async function ProducerForecastPage() {
               </div>
 
               {/* Cumul 4 semaines */}
-              <div className="flex flex-wrap gap-3 pt-3 border-t border-white/10">
+              <div className="flex flex-wrap gap-3 pt-3 border-t border-border">
                 <div className="flex items-center gap-2 px-3 py-2 bg-accent/10 border border-accent/20 rounded-xl">
                   <Fuel className="w-4 h-4 text-primary" />
                   <span className="text-sm font-semibold text-foreground">
@@ -411,7 +411,7 @@ export default async function ProducerForecastPage() {
             <CardContent>
               {/* Total paniers par taille */}
               <div className="mb-6">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-3">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
                   Total paniers prévus
                 </p>
                 <div className="flex gap-3 flex-wrap">
@@ -420,14 +420,14 @@ export default async function ProducerForecastPage() {
                     .map(([size, count]) => (
                       <div
                         key={size}
-                        className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-white/5 border border-white/10"
+                        className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-white/5 border border-border"
                       >
-                        <span className="text-2xl font-bold text-neutral-50">{count}</span>
-                        <span className="text-xs text-neutral-500 font-medium">Panier {size}</span>
+                        <span className="text-2xl font-bold text-foreground">{count}</span>
+                        <span className="text-xs text-muted-foreground font-medium">Panier {size}</span>
                       </div>
                     ))}
                   {Object.keys(nextWeekSizes).length === 0 && (
-                    <p className="text-sm text-neutral-600">Aucun panier prévu.</p>
+                    <p className="text-sm text-muted-foreground/60">Aucun panier prévu.</p>
                   )}
                 </div>
               </div>
@@ -435,20 +435,20 @@ export default async function ProducerForecastPage() {
               {/* Répartition par entité */}
               {nextWeekEntities.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
                     Par entité
                   </p>
                   <div className="space-y-3">
                     {nextWeekEntities.map((entity) => (
                       <div
                         key={entity.entity_id}
-                        className="flex items-center justify-between py-2 border-b border-white/5 last:border-0"
+                        className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
                       >
                         <div>
-                          <p className="text-sm font-medium text-neutral-200">
+                          <p className="text-sm font-medium text-foreground/80">
                             {entity.entity_name}
                           </p>
-                          <p className="text-xs text-neutral-500">
+                          <p className="text-xs text-muted-foreground">
                             {entity.confirmed_orders_count} confirmée(s) + {entity.projected_orders_count} projetée(s)
                           </p>
                         </div>
@@ -458,7 +458,7 @@ export default async function ProducerForecastPage() {
                             .map(([size, count]) => (
                               <span
                                 key={size}
-                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-medium text-neutral-300"
+                                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-white/5 border border-border text-[10px] font-medium text-foreground/70"
                               >
                                 {size}&nbsp;×{count}
                               </span>

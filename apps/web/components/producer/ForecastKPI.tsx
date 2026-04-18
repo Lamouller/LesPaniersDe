@@ -12,11 +12,11 @@ interface ForecastKPIProps {
 export function ForecastKPI({ label, value, sub, icon: Icon, accent = 'default' }: ForecastKPIProps) {
   const colorMap = {
     default: {
-      wrap: 'bg-white/5 border-white/10',
-      icon: 'bg-white/5 border border-white/10',
-      iconText: 'text-neutral-400',
-      value: 'text-neutral-50',
-      sub: 'text-neutral-600',
+      wrap: 'bg-white/5 border-border',
+      icon: 'bg-white/5 border border-border',
+      iconText: 'text-muted-foreground',
+      value: 'text-foreground',
+      sub: 'text-muted-foreground/70',
     },
     green: {
       wrap: 'bg-green-500/5 border-green-500/20',
@@ -51,7 +51,7 @@ export function ForecastKPI({ label, value, sub, icon: Icon, accent = 'default' 
         </div>
       </div>
       <p className={`text-2xl font-bold mb-1 ${colors.value}`}>{value}</p>
-      <p className="text-xs text-neutral-500">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
       {sub && <p className={`text-xs mt-1 ${colors.sub}`}>{sub}</p>}
     </div>
   );

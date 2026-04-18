@@ -31,7 +31,7 @@ const KIND_ICON_COLOR: Record<ProductKind, string> = {
   basket: 'text-green-500/60',
   fruit_option: 'text-amber-500/60',
   egg_option: 'text-yellow-400/60',
-  other: 'text-neutral-400/60',
+  other: 'text-muted-foreground/60',
 };
 
 function KindFallbackIcon({ kind }: { kind: ProductKind }) {
@@ -82,7 +82,7 @@ export default function ProductCard({
 
   return (
     <div
-      className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:bg-white/[0.07] hover:border-white/15 ${
+      className={`bg-white/5 backdrop-blur-xl border border-border rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:bg-white/[0.07] hover:border-border/70 ${
         !is_available ? 'opacity-50' : ''
       }`}
     >
@@ -106,13 +106,13 @@ export default function ProductCard({
 
       {/* Contenu */}
       <div className="p-4">
-        <p className="text-sm font-semibold text-neutral-50 mb-1">{product_name}</p>
+        <p className="text-sm font-semibold text-foreground mb-1">{product_name}</p>
         {description && (
-          <p className="text-xs text-neutral-500 mb-3 leading-relaxed line-clamp-2">{description}</p>
+          <p className="text-xs text-muted-foreground mb-3 leading-relaxed line-clamp-2">{description}</p>
         )}
 
         <div className="flex items-center justify-between mt-auto">
-          <span className="text-base font-bold text-neutral-50">
+          <span className="text-base font-bold text-foreground">
             {formatCents(unit_price_cents)}
           </span>
 
@@ -131,12 +131,12 @@ export default function ProductCard({
                 <button
                   type="button"
                   onClick={handleDecrement}
-                  className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:bg-white/10 active:scale-[0.98] transition-all duration-200"
+                  className="w-8 h-8 rounded-lg bg-white/5 border border-border flex items-center justify-center text-foreground/70 hover:bg-white/10 active:scale-[0.98] transition-all duration-200"
                   aria-label="Diminuer"
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="w-6 text-center text-sm text-neutral-50 font-medium">
+                <span className="w-6 text-center text-sm text-foreground font-medium">
                   {qty}
                 </span>
                 <button
@@ -150,7 +150,7 @@ export default function ProductCard({
               </div>
             )
           ) : (
-            <span className="text-xs text-neutral-600">
+            <span className="text-xs text-muted-foreground/60">
               {!is_available ? 'Indisponible' : 'Bloqué'}
             </span>
           )}

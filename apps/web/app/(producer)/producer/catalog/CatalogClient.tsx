@@ -75,17 +75,17 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <BookOpen className="w-5 h-5 text-neutral-400 mt-1 flex-shrink-0" />
+          <BookOpen className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Catalogue de la semaine</h1>
-            <p className="text-sm text-neutral-500">Ouverture des commandes pour la semaine du {weekStart}</p>
-            <p className="text-xs text-neutral-600 mt-0.5">Livraison prévue le {deliveryDate}</p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Catalogue de la semaine</h1>
+            <p className="text-sm text-muted-foreground">Ouverture des commandes pour la semaine du {weekStart}</p>
+            <p className="text-xs text-muted-foreground/60 mt-0.5">Livraison prévue le {deliveryDate}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link
             href="/producer/products"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-neutral-400 border border-white/10 hover:bg-white/5 hover:text-neutral-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-muted-foreground border border-border hover:bg-white/5 hover:text-foreground transition-colors"
           >
             <Package className="w-3.5 h-3.5" />
             Modifier mes produits permanents →
@@ -109,7 +109,7 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 disabled={readOnly}
-                className={`w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 ${disabledClass}`}
+                className={`w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 ${disabledClass}`}
               />
             </div>
             <div className="space-y-1.5">
@@ -126,16 +126,16 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
             <div>
-              <p className="text-sm font-medium text-neutral-200">Commandes ouvertes</p>
-              <p className="text-xs text-neutral-600">Les clients peuvent commander</p>
+              <p className="text-sm font-medium text-foreground/80">Commandes ouvertes</p>
+              <p className="text-xs text-muted-foreground/60">Les clients peuvent commander</p>
             </div>
             <button
               type="button"
               onClick={() => { if (!readOnly) setIsOpen(!isOpen); }}
               disabled={readOnly}
-              className={`p-1 text-neutral-400 hover:text-neutral-200 transition-colors ${disabledClass}`}
+              className={`p-1 text-muted-foreground hover:text-foreground transition-colors ${disabledClass}`}
               aria-label={isOpen ? 'Fermer les commandes' : 'Ouvrir les commandes'}
             >
               {isOpen ? (
@@ -197,7 +197,7 @@ export function CatalogClient({ readOnly }: CatalogClientProps) {
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
-                    className="p-2 text-neutral-600 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10"
+                    className="p-2 text-muted-foreground/60 hover:text-red-400 transition-colors rounded-lg hover:bg-red-500/10"
                     aria-label="Supprimer"
                   >
                     <Trash2 className="w-4 h-4" />

@@ -13,23 +13,41 @@ const shots = [
   { name: '01-landing', url: '/', auth: null, theme: 'dark' },
   { name: '01-landing-light', url: '/', auth: null, theme: 'light' },
   { name: '03-login', url: '/login', auth: null, theme: 'dark' },
+  { name: '03-login-light', url: '/login', auth: null, theme: 'light' },
 
-  // Client (alice)
+  // Client (alice) — dark
   { name: '10-shop', url: '/shop', auth: 'alice@antislash.local', theme: 'dark' },
   { name: '12-account', url: '/account', auth: 'alice@antislash.local', theme: 'dark' },
   { name: '13-account-stats', url: '/account/stats', auth: 'alice@antislash.local', theme: 'dark' },
   { name: '14-account-community', url: '/account/community', auth: 'alice@antislash.local', theme: 'dark' },
 
-  // Admin
+  // Client (alice) — light
+  { name: '10-shop-light', url: '/shop', auth: 'alice@antislash.local', theme: 'light' },
+  { name: '12-account-light', url: '/account', auth: 'alice@antislash.local', theme: 'light' },
+  { name: '13-account-stats-light', url: '/account/stats', auth: 'alice@antislash.local', theme: 'light' },
+  { name: '14-account-community-light', url: '/account/community', auth: 'alice@antislash.local', theme: 'light' },
+
+  // Admin — dark
   { name: '20-admin-dashboard', url: '/admin', auth: 'admin@lespaniersde.local', theme: 'dark' },
   { name: '21-admin-sales', url: '/admin/sales', auth: 'admin@lespaniersde.local', theme: 'dark' },
   { name: '22-admin-forecast', url: '/admin/forecast', auth: 'admin@lespaniersde.local', theme: 'dark' },
   { name: '23-admin-producers', url: '/admin/producers', auth: 'admin@lespaniersde.local', theme: 'dark' },
 
-  // Producer (nadine)
+  // Admin — light
+  { name: '20-admin-dashboard-light', url: '/admin', auth: 'admin@lespaniersde.local', theme: 'light' },
+  { name: '21-admin-sales-light', url: '/admin/sales', auth: 'admin@lespaniersde.local', theme: 'light' },
+  { name: '22-admin-forecast-light', url: '/admin/forecast', auth: 'admin@lespaniersde.local', theme: 'light' },
+  { name: '23-admin-producers-light', url: '/admin/producers', auth: 'admin@lespaniersde.local', theme: 'light' },
+
+  // Producer (nadine) — dark
   { name: '30-producer-dashboard', url: '/producer', auth: 'nadine@lespaniersde.local', theme: 'dark' },
   { name: '31-producer-forecast', url: '/producer/forecast', auth: 'nadine@lespaniersde.local', theme: 'dark' },
   { name: '32-producer-catalog', url: '/producer/catalog', auth: 'nadine@lespaniersde.local', theme: 'dark' },
+
+  // Producer (nadine) — light
+  { name: '30-producer-dashboard-light', url: '/producer', auth: 'nadine@lespaniersde.local', theme: 'light' },
+  { name: '31-producer-forecast-light', url: '/producer/forecast', auth: 'nadine@lespaniersde.local', theme: 'light' },
+  { name: '32-producer-catalog-light', url: '/producer/catalog', auth: 'nadine@lespaniersde.local', theme: 'light' },
 ];
 
 const passwords = {

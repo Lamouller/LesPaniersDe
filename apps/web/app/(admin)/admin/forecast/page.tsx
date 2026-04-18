@@ -146,16 +146,16 @@ export default async function AdminForecastPage() {
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
             Vue globale
           </p>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-50">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
             Previsionnel agrege plateforme
           </h1>
         </div>
         <Link
           href="/api/admin/forecast/export"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-medium text-neutral-300 hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-border text-sm font-medium text-foreground/70 hover:bg-white/10 hover:border-white/20 transition-all duration-200"
         >
           <Download className="w-4 h-4" />
           Exporter CSV
@@ -164,15 +164,15 @@ export default async function AdminForecastPage() {
 
       {/* Grand KPI */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl lg:col-span-2">
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-xl lg:col-span-2">
           <div className="flex items-start justify-between mb-3">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-green-500/10">
               <TrendingUp className="w-4 h-4 text-green-400" />
             </div>
           </div>
           <p className="text-3xl font-bold text-green-300 mb-1">{formatCents(total4wCents)}</p>
-          <p className="text-xs text-neutral-500">CA total previsionnel 4 prochaines semaines</p>
-          <p className="text-xs text-neutral-600 mt-1">{totalOrders} commandes (confirmees + projetees)</p>
+          <p className="text-xs text-muted-foreground">CA total previsionnel 4 prochaines semaines</p>
+          <p className="text-xs text-muted-foreground/60 mt-1">{totalOrders} commandes (confirmees + projetees)</p>
         </div>
         <div
           className={`backdrop-blur-xl border rounded-2xl p-5 shadow-xl ${
@@ -180,13 +180,13 @@ export default async function AdminForecastPage() {
               ? 'border-red-500/20 bg-red-500/5'
               : warningCount > 0
               ? 'border-amber-500/20 bg-amber-500/5'
-              : 'bg-white/5 border-white/10'
+              : 'bg-white/5 border-border'
           }`}
         >
           <div className="flex items-start justify-between mb-3">
             <div
               className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                criticalCount > 0 || warningCount > 0 ? 'bg-red-500/10' : 'bg-white/5 border border-white/10'
+                criticalCount > 0 || warningCount > 0 ? 'bg-red-500/10' : 'bg-white/5 border border-border'
               }`}
             >
               <AlertTriangle
@@ -195,34 +195,34 @@ export default async function AdminForecastPage() {
                     ? 'text-red-400'
                     : warningCount > 0
                     ? 'text-amber-400'
-                    : 'text-neutral-400'
+                    : 'text-muted-foreground'
                 }`}
               />
             </div>
           </div>
           <p
             className={`text-2xl font-bold mb-1 ${
-              criticalCount > 0 ? 'text-red-300' : warningCount > 0 ? 'text-amber-300' : 'text-neutral-50'
+              criticalCount > 0 ? 'text-red-300' : warningCount > 0 ? 'text-amber-300' : 'text-foreground'
             }`}
           >
             {criticalCount + warningCount}
           </p>
-          <p className="text-xs text-neutral-500">Alertes capacite</p>
-          <p className="text-xs text-neutral-600 mt-1">
+          <p className="text-xs text-muted-foreground">Alertes capacite</p>
+          <p className="text-xs text-muted-foreground/60 mt-1">
             {criticalCount} critique(s) · {warningCount} attention
           </p>
         </div>
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl">
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-xl">
           <div className="flex items-start justify-between mb-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 border border-white/10">
-              <Users className="w-4 h-4 text-neutral-400" />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-white/5 border border-border">
+              <Users className="w-4 h-4 text-muted-foreground" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-neutral-50 mb-1">
+          <p className="text-2xl font-bold text-foreground mb-1">
             {aggregate[0]?.producers_count ?? 0}
           </p>
-          <p className="text-xs text-neutral-500">Producteurs actifs</p>
-          <p className="text-xs text-neutral-600 mt-1">{aggregate[0]?.entities_count ?? 0} entites</p>
+          <p className="text-xs text-muted-foreground">Producteurs actifs</p>
+          <p className="text-xs text-muted-foreground/60 mt-1">{aggregate[0]?.entities_count ?? 0} entites</p>
         </div>
       </div>
 
@@ -281,24 +281,24 @@ export default async function AdminForecastPage() {
         <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <ShoppingBasket className="w-4 h-4 text-neutral-400" />
+              <ShoppingBasket className="w-4 h-4 text-muted-foreground" />
               Detail par semaine
             </CardTitle>
           </CardHeader>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                <tr className="border-b border-border">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Semaine
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     CA total
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">
                     Commandes
                   </th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">
                     Moy. panier
                   </th>
                 </tr>
@@ -313,7 +313,7 @@ export default async function AdminForecastPage() {
                     <tr key={row.week_start} className="hover:bg-white/[0.03] transition-colors">
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-neutral-200">{row.week_label}</span>
+                          <span className="text-sm text-foreground/80">{row.week_label}</span>
                           {row.week_offset === 0 && (
                             <Badge variant="success" className="text-[10px]">
                               En cours
@@ -324,10 +324,10 @@ export default async function AdminForecastPage() {
                       <td className="px-4 py-2.5 text-sm font-semibold text-green-400">
                         {formatCents(row.total_revenue_cents)}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-neutral-400 hidden md:table-cell">
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground hidden md:table-cell">
                         {row.orders_count}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-neutral-400 hidden md:table-cell">
+                      <td className="px-4 py-2.5 text-xs text-muted-foreground hidden md:table-cell">
                         {avgBasket > 0 ? formatCents(avgBasket) : '—'}
                       </td>
                     </tr>
@@ -335,7 +335,7 @@ export default async function AdminForecastPage() {
                 })}
                 {aggregate.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-sm text-neutral-600">
+                    <td colSpan={4} className="px-4 py-6 text-center text-sm text-muted-foreground/60">
                       Aucune donnee.
                     </td>
                   </tr>

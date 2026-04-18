@@ -85,14 +85,14 @@ const KIND_ICON_COLOR: Record<Product['kind'], string> = {
   basket: 'text-primary/60',
   fruit_option: 'text-amber-500/60',
   egg_option: 'text-yellow-400/60',
-  other: 'text-neutral-400/60',
+  other: 'text-muted-foreground/60',
 };
 
 const KIND_BADGE_COLOR: Record<Product['kind'], string> = {
   basket: 'bg-primary/20 text-primary border-primary/30',
   fruit_option: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
   egg_option: 'bg-yellow-400/20 text-yellow-300 border-yellow-400/30',
-  other: 'bg-neutral-500/20 text-neutral-400 border-neutral-500/30',
+  other: 'bg-muted text-muted-foreground border-border',
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,10 +230,10 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
   }
 
   const priceCls =
-    'w-full pl-3 pr-8 py-2 text-2xl font-bold text-primary bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+    'w-full pl-3 pr-8 py-2 text-2xl font-bold text-primary bg-white/5 border border-border rounded-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
-    <div className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:border-white/20 hover:bg-white/[0.07] transition-all duration-300">
+    <div className="group relative bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-xl hover:border-white/20 hover:bg-white/[0.07] transition-all duration-300">
       {/* Photo zone */}
       <div className="relative aspect-[4/3] overflow-hidden">
         {product.photo_url ? (
@@ -280,9 +280,9 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
       <div className="p-4 space-y-3">
         {/* Nom + taille */}
         <div>
-          <h3 className="font-semibold text-lg text-neutral-50 leading-tight">{product.name}</h3>
+          <h3 className="font-semibold text-lg text-foreground leading-tight">{product.name}</h3>
           {product.size && product.kind === 'basket' && (
-            <span className="inline-block mt-0.5 text-xs font-medium text-neutral-400 bg-white/5 border border-white/10 rounded px-1.5 py-0.5">
+            <span className="inline-block mt-0.5 text-xs font-medium text-muted-foreground bg-white/5 border border-border rounded px-1.5 py-0.5">
               Taille {product.size}
             </span>
           )}
@@ -290,7 +290,7 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
 
         {/* Description */}
         {product.description && (
-          <p className="text-sm text-neutral-400 leading-relaxed line-clamp-3">
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
             {product.description}
           </p>
         )}
@@ -319,17 +319,17 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
             </div>
             {priceError && <p className="text-xs text-red-400 mt-1">{priceError}</p>}
           </div>
-          {priceSaving && <Loader2 className="w-4 h-4 animate-spin text-neutral-400 flex-shrink-0 mb-2" />}
+          {priceSaving && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground flex-shrink-0 mb-2" />}
           {priceSaved && <Check className="w-4 h-4 text-green-400 flex-shrink-0 mb-2" />}
         </div>
 
         {/* Actions */}
         {!readOnly && (
-          <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+          <div className="flex items-center gap-2 pt-1 border-t border-border/50">
             <button
               type="button"
               onClick={onEdit}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-foreground/70 bg-white/5 border border-border hover:bg-white/10 hover:border-white/20 transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
               Éditer
@@ -338,7 +338,7 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
               <button
                 type="button"
                 onClick={() => setConfirmDelete(true)}
-                className="p-1.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
+                className="p-1.5 rounded-lg text-muted-foreground/60 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
                 title="Supprimer"
               >
                 <Trash2 className="w-4 h-4" />
@@ -357,7 +357,7 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
                 <button
                   type="button"
                   onClick={() => setConfirmDelete(false)}
-                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-neutral-400 hover:bg-white/10 transition-colors"
+                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-muted-foreground hover:bg-white/10 transition-colors"
                 >
                   Non
                 </button>
@@ -473,7 +473,7 @@ function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModa
     onClose();
   }
 
-  const inputCls = `w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-100
+  const inputCls = `w-full px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground
     focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors`;
   const errorCls = 'text-xs text-red-400 mt-1';
 
@@ -489,11 +489,11 @@ function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModa
           <div className="space-y-2">
             <Label>Photo</Label>
             <div className="flex items-start gap-4">
-              <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 bg-white/5 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-xl overflow-hidden border border-border flex-shrink-0 bg-white/5 flex items-center justify-center">
                 {previewUrl ? (
                   <img src={previewUrl} alt="Aperçu" className="w-full h-full object-cover" />
                 ) : (
-                  <ImageOff className="w-8 h-8 text-neutral-600" />
+                  <ImageOff className="w-8 h-8 text-muted-foreground/60" />
                 )}
               </div>
               <div className="flex-1 space-y-2">
@@ -508,7 +508,7 @@ function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModa
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingPhoto}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-foreground/70 bg-white/5 border border-border hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
                 >
                   {uploadingPhoto ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -517,7 +517,7 @@ function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModa
                   )}
                   {uploadingPhoto ? 'Upload en cours…' : 'Choisir une photo'}
                 </button>
-                <p className="text-xs text-neutral-500">JPEG, PNG ou WebP · Max 5 Mo</p>
+                <p className="text-xs text-muted-foreground">JPEG, PNG ou WebP · Max 5 Mo</p>
                 <input
                   type="text"
                   className={`${inputCls} text-xs`}
@@ -582,7 +582,7 @@ function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModa
                 inputMode="decimal"
                 {...register('price_euro')}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500 pointer-events-none">€</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">€</span>
             </div>
             {errors.price_euro && <p className={errorCls}>{errors.price_euro.message}</p>}
           </div>
@@ -749,7 +749,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
     handleClose();
   }
 
-  const inputCls = `w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-100
+  const inputCls = `w-full px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground
     focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors`;
   const errorCls = 'text-xs text-red-400 mt-1';
 
@@ -765,11 +765,11 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
           <div className="space-y-2">
             <Label>Photo</Label>
             <div className="flex items-start gap-4">
-              <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 bg-white/5 flex items-center justify-center">
+              <div className="w-24 h-24 rounded-xl overflow-hidden border border-border flex-shrink-0 bg-white/5 flex items-center justify-center">
                 {previewUrl ? (
                   <img src={previewUrl} alt="Aperçu" className="w-full h-full object-cover" />
                 ) : (
-                  <ImageOff className="w-8 h-8 text-neutral-600" />
+                  <ImageOff className="w-8 h-8 text-muted-foreground/60" />
                 )}
               </div>
               <div className="flex-1 space-y-2">
@@ -784,7 +784,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingPhoto}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-foreground/70 bg-white/5 border border-border hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
                 >
                   {uploadingPhoto ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -793,7 +793,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
                   )}
                   {uploadingPhoto ? 'Upload…' : 'Choisir une photo'}
                 </button>
-                <p className="text-xs text-neutral-500">JPEG, PNG ou WebP · Max 5 Mo</p>
+                <p className="text-xs text-muted-foreground">JPEG, PNG ou WebP · Max 5 Mo</p>
                 <input
                   type="text"
                   className={`${inputCls} text-xs`}
@@ -858,7 +858,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
                 inputMode="decimal"
                 {...register('price_euro')}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500 pointer-events-none">€</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">€</span>
             </div>
             {errors.price_euro && <p className={errorCls}>{errors.price_euro.message}</p>}
           </div>
@@ -965,8 +965,8 @@ export function ProductsTableClient({
             <Package className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Mes produits</h1>
-            <p className="text-sm text-neutral-500">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Mes produits</h1>
+            <p className="text-sm text-muted-foreground">
               Catalogue permanent — photos, prix et descriptions
             </p>
           </div>
@@ -975,7 +975,7 @@ export function ProductsTableClient({
           <button
             type="button"
             onClick={() => setShowInactive((v) => !v)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-neutral-400 border border-white/10 hover:bg-white/5 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-muted-foreground border border-border hover:bg-white/5 transition-colors"
           >
             {showInactive ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
             {showInactive ? 'Masquer inactifs' : 'Afficher inactifs'}
@@ -995,7 +995,7 @@ export function ProductsTableClient({
       </div>
 
       {/* Hint catalogue hebdo */}
-      <div className="flex items-center gap-2 text-sm text-neutral-500">
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Info className="w-4 h-4 flex-shrink-0" />
         <span>
           Pour ouvrir des commandes, rendez-vous dans{' '}
@@ -1007,9 +1007,9 @@ export function ProductsTableClient({
 
       {/* Grille par section */}
       {grouped.length === 0 ? (
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl py-16 text-center">
-          <Package className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
-          <p className="text-neutral-500">
+        <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl py-16 text-center">
+          <Package className="w-12 h-12 text-muted-foreground/60 mx-auto mb-3" />
+          <p className="text-muted-foreground">
             Aucun produit{!showInactive ? ' actif' : ''} pour le moment.
           </p>
           {!readOnly && (
@@ -1027,11 +1027,11 @@ export function ProductsTableClient({
         grouped.map(({ kind, items }) => (
           <section key={kind} className="space-y-4">
             <div className="flex items-center gap-2">
-              <KindIcon kind={kind} className="w-4 h-4 text-neutral-400" />
-              <h2 className="text-sm font-semibold text-neutral-300 uppercase tracking-wider">
+              <KindIcon kind={kind} className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground/70 uppercase tracking-wider">
                 {KIND_LABELS[kind]}
               </h2>
-              <span className="text-xs text-neutral-600">({items.length})</span>
+              <span className="text-xs text-muted-foreground/60">({items.length})</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

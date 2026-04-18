@@ -197,7 +197,7 @@ export function LiveDeliveryMap({
       )}
 
       {/* Map */}
-      <div className="relative rounded-xl overflow-hidden border border-white/10 h-52">
+      <div className="relative rounded-xl overflow-hidden border border-border h-52">
         {loading && (
           <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />

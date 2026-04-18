@@ -7,9 +7,7 @@ import {
   ArrowUpRight,
   RotateCcw,
   RotateCw,
-  Navigation,
   Flag,
-  Gauge,
 } from 'lucide-react';
 
 export interface NavStep {
@@ -32,10 +30,14 @@ interface TurnByTurnProps {
   totalDistanceRemaining: number; // metres
   totalDurationRemaining: number; // seconds
   currentSpeedKmh?: number;
+  /** Whether speech synthesis is muted externally */
+  isMuted?: boolean;
+  /** 'inline' = compact single-row for the top nav bar; 'card' (default) = standalone card */
+  layout?: 'inline' | 'card';
 }
 
-function ManeuverIcon({ type, modifier }: { type: string; modifier: string | null }) {
-  const cls = 'w-8 h-8';
+function ManeuverIcon({ type, modifier, size = 'lg' }: { type: string; modifier: string | null; size?: 'sm' | 'lg' }) {
+  const cls = size === 'lg' ? 'w-10 h-10' : 'w-6 h-6';
 
   if (type === 'arrive' || type === 'depart') return <Flag className={cls} />;
   if (type === 'roundabout' || type === 'rotary') return <RotateCw className={cls} />;
@@ -50,12 +52,12 @@ function ManeuverIcon({ type, modifier }: { type: string; modifier: string | nul
   return <ArrowUp className={cls} />;
 }
 
-function fmtDistance(m: number): string {
+export function fmtDistance(m: number): string {
   if (m < 1000) return `${Math.round(m / 10) * 10} m`;
   return `${(m / 1000).toFixed(1)} km`;
 }
 
-function fmtDuration(s: number): string {
+export function fmtDuration(s: number): string {
   if (s < 60) return `${Math.round(s)} s`;
   const m = Math.round(s / 60);
   if (m < 60) return `${m} min`;
@@ -64,7 +66,7 @@ function fmtDuration(s: number): string {
   return `${h}h ${rem}min`;
 }
 
-function maneuverText(step: NavStep): string {
+export function maneuverText(step: NavStep): string {
   const type = step.maneuver_type;
   const mod = step.maneuver_modifier ?? '';
   const street = step.street_name ? ` sur ${step.street_name}` : '';
@@ -98,6 +100,8 @@ export function TurnByTurn({
   totalDistanceRemaining,
   totalDurationRemaining,
   currentSpeedKmh,
+  isMuted = false,
+  layout = 'card',
 }: TurnByTurnProps) {
   const spokenRef = useRef<number>(-1);
 
@@ -107,6 +111,7 @@ export function TurnByTurn({
   // Vocal guidance: speak when within 300m of a maneuver
   useEffect(() => {
     if (!currentStep) return;
+    if (isMuted) return;
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
     if (spokenRef.current === currentStepIndex) return;
 
@@ -117,6 +122,12 @@ export function TurnByTurn({
           : `Dans ${fmtDistance(distanceToNextStep)}, ${maneuverText(currentStep)}`;
 
       spokenRef.current = currentStepIndex;
+
+      // Vibration feedback
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = 'fr-FR';
       utt.rate = 1.0;
@@ -124,69 +135,86 @@ export function TurnByTurn({
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(utt);
     }
-  }, [currentStepIndex, distanceToNextStep, currentStep]);
+  }, [currentStepIndex, distanceToNextStep, currentStep, isMuted]);
 
   if (!currentStep) return null;
 
+  // ── Inline layout (used inside the top nav bar) ────────────────────────────
+  if (layout === 'inline') {
+    return (
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        {/* Maneuver icon */}
+        <div className="shrink-0 w-16 h-16 rounded-2xl bg-primary/20 border-2 border-primary flex items-center justify-center text-white">
+          <ManeuverIcon type={currentStep.maneuver_type} modifier={currentStep.maneuver_modifier} size="lg" />
+        </div>
+
+        {/* Instruction text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-2xl font-bold text-amber-400 leading-none tabular-nums">
+            {fmtDistance(distanceToNextStep)}
+          </p>
+          <p className="text-4xl md:text-5xl font-bold text-white leading-tight mt-0.5 truncate">
+            {maneuverText(currentStep)}
+          </p>
+          {nextStep && (
+            <p className="text-sm text-zinc-400 mt-1 truncate">
+              Ensuite : {maneuverText(nextStep)}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Card layout (standalone overlay, legacy) ───────────────────────────────
   return (
     <div className="pointer-events-none select-none space-y-2">
       {/* Main instruction card */}
-      <div className="pointer-events-auto bg-[rgba(15,27,21,0.92)] backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="pointer-events-auto bg-zinc-900 border-2 border-primary rounded-2xl shadow-2xl overflow-hidden">
         {/* Next maneuver */}
-        <div className="flex items-center gap-4 px-5 py-4">
-          <div className="shrink-0 w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-white">
-            <ManeuverIcon type={currentStep.maneuver_type} modifier={currentStep.maneuver_modifier} />
+        <div className="flex items-center gap-4 px-5 py-4" aria-live="assertive" aria-atomic="true">
+          <div className="shrink-0 w-16 h-16 rounded-xl bg-primary/20 border-2 border-primary flex items-center justify-center text-white">
+            <ManeuverIcon type={currentStep.maneuver_type} modifier={currentStep.maneuver_modifier} size="lg" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-2xl font-bold text-white leading-tight">
+            <p className="text-2xl font-bold text-amber-400 leading-none tabular-nums">
               {fmtDistance(distanceToNextStep)}
             </p>
-            <p className="text-sm text-white/70 mt-0.5 truncate">
+            <p className="text-4xl font-bold text-white leading-tight mt-0.5 truncate">
               {maneuverText(currentStep)}
             </p>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/10 mx-5" />
+        <div className="h-px bg-zinc-800 mx-5" />
 
         {/* Bottom stats row */}
-        <div className="flex items-center gap-4 px-5 py-3 text-xs text-white/60">
-          {/* Total remaining */}
-          <div className="flex items-center gap-1.5">
-            <Navigation className="w-3.5 h-3.5 shrink-0" />
-            <span>{fmtDistance(totalDistanceRemaining)}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span>ETA</span>
-            <span className="text-white/80 font-medium">{fmtDuration(totalDurationRemaining)}</span>
-          </div>
-          {/* Speed */}
+        <div className="flex items-center gap-4 px-5 py-3 text-sm text-zinc-400">
+          <span>{fmtDistance(totalDistanceRemaining)}</span>
+          <span className="text-zinc-500">·</span>
+          <span className="text-white font-medium">ETA {fmtDuration(totalDurationRemaining)}</span>
           {currentSpeedKmh !== undefined && (
-            <div className="ml-auto flex items-center gap-1.5">
-              <Gauge className="w-3.5 h-3.5 shrink-0" />
-              <span className="text-white/80 font-medium">{Math.round(currentSpeedKmh)} km/h</span>
-            </div>
+            <span className="ml-auto text-amber-400 font-bold text-3xl tabular-nums">
+              {Math.round(currentSpeedKmh)} <span className="text-xs text-zinc-500 font-normal">km/h</span>
+            </span>
           )}
         </div>
       </div>
 
       {/* Next step preview */}
       {nextStep && (
-        <div className="pointer-events-auto bg-[rgba(15,27,21,0.75)] backdrop-blur-sm border border-white/8 rounded-xl px-4 py-2.5 flex items-center gap-3">
-          <div className="shrink-0 w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white/60">
-            <ManeuverIcon type={nextStep.maneuver_type} modifier={nextStep.maneuver_modifier} />
+        <div className="pointer-events-auto bg-zinc-900/90 border border-zinc-700 rounded-xl px-4 py-2.5 flex items-center gap-3">
+          <div className="shrink-0 w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400">
+            <ManeuverIcon type={nextStep.maneuver_type} modifier={nextStep.maneuver_modifier} size="sm" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-white/50">Ensuite</p>
-            <p className="text-sm text-white/80 truncate">{maneuverText(nextStep)}</p>
+            <p className="text-xs text-zinc-500">Ensuite</p>
+            <p className="text-sm text-zinc-200 truncate">{maneuverText(nextStep)}</p>
           </div>
-          <span className="text-xs text-white/50 shrink-0">{fmtDistance(nextStep.distance_m)}</span>
+          <span className="text-xs text-zinc-500 shrink-0">{fmtDistance(nextStep.distance_m)}</span>
         </div>
       )}
     </div>
   );
 }
-
-// Export helpers for use in the nav page
-export { fmtDistance, fmtDuration, maneuverText };

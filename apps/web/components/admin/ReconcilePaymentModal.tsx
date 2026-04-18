@@ -100,7 +100,7 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
         <div className="space-y-4">
           {/* Méthode */}
           <div>
-            <p className="text-sm font-medium text-neutral-300 mb-2">Mode de paiement</p>
+            <p className="text-sm font-medium text-foreground/70 mb-2">Mode de paiement</p>
             <div className="grid grid-cols-2 gap-2">
               {METHODS.map((m) => (
                 <button
@@ -109,8 +109,8 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
                   onClick={() => setMethod(m.value)}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200 ${
                     method === m.value
-                      ? 'bg-white/10 border-white/30 text-neutral-50'
-                      : 'bg-white/[0.03] border-white/10 text-neutral-400 hover:bg-white/5 hover:text-neutral-200'
+                      ? 'bg-white/10 border-white/30 text-foreground'
+                      : 'bg-white/[0.03] border-border text-muted-foreground hover:bg-white/5 hover:text-foreground'
                   }`}
                 >
                   {m.icon}
@@ -122,8 +122,8 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
 
           {/* Référence */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300" htmlFor="reconcile-ref">
-              Référence <span className="text-neutral-600 font-normal">(optionnel)</span>
+            <label className="text-sm font-medium text-foreground/70" htmlFor="reconcile-ref">
+              Référence <span className="text-muted-foreground/60 font-normal">(optionnel)</span>
             </label>
             <input
               id="reconcile-ref"
@@ -131,14 +131,14 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               placeholder={currentMethod?.placeholder ?? '—'}
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20"
             />
           </div>
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-300" htmlFor="reconcile-notes">
-              Notes <span className="text-neutral-600 font-normal">(optionnel)</span>
+            <label className="text-sm font-medium text-foreground/70" htmlFor="reconcile-notes">
+              Notes <span className="text-muted-foreground/60 font-normal">(optionnel)</span>
             </label>
             <textarea
               id="reconcile-notes"
@@ -146,7 +146,7 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               placeholder="Remarque interne..."
-              className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-none"
+              className="w-full px-3 py-2.5 bg-white/5 border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20 resize-none"
             />
           </div>
 
@@ -159,7 +159,7 @@ export function ReconcilePaymentModal({ target, onClose, onSuccess }: Props) {
                 onChange={(e) => setUnblockClient(e.target.checked)}
                 className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer"
               />
-              <span className="text-sm text-neutral-300 group-hover:text-neutral-200 transition-colors">
+              <span className="text-sm text-foreground/70 group-hover:text-foreground transition-colors">
                 Débloquer le client si tous ses impayés sont réglés
               </span>
             </label>

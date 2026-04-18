@@ -51,7 +51,7 @@ function CustomTooltip({
 export function TrendChart({ data }: TrendChartProps) {
   if (!data.length) {
     return (
-      <div className="flex items-center justify-center h-48 text-sm text-neutral-600">
+      <div className="flex items-center justify-center h-48 text-sm text-muted-foreground/60">
         Pas encore de données historiques.
       </div>
     );

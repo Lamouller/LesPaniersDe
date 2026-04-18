@@ -47,7 +47,7 @@ function CustomTooltip({
 export function ProducerBreakdownChart({ data }: ProducerBreakdownChartProps) {
   if (!data.length) {
     return (
-      <div className="flex items-center justify-center h-32 text-sm text-neutral-600">
+      <div className="flex items-center justify-center h-32 text-sm text-muted-foreground/60">
         Aucune donnée.
       </div>
     );

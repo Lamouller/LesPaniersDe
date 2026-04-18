@@ -17,7 +17,7 @@ export default function WeekDeadlineBanner({ deadline, weekStart }: Props) {
 
   return (
     <div className="space-y-2 mb-8">
-      <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
         Semaine du {formattedWeek}
       </p>
       <div className="flex items-center gap-3 px-4 py-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">

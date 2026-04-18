@@ -98,17 +98,17 @@ export default async function OrderDetailPage({
         <Link href="/account">
           <button
             type="button"
-            className="p-2 rounded-xl text-neutral-400 hover:bg-white/5 hover:text-neutral-200 transition-all duration-200"
+            className="p-2 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-foreground/80 transition-all duration-200"
             aria-label="Retour"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Commande
           </p>
-          <h1 className="text-xl font-bold tracking-tight text-neutral-50">
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
             {order.order_number}
           </h1>
         </div>
@@ -124,7 +124,7 @@ export default async function OrderDetailPage({
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="w-4 h-4 text-neutral-400" />
+              <Clock className="w-4 h-4 text-muted-foreground" />
               Statut
             </CardTitle>
           </CardHeader>
@@ -141,17 +141,17 @@ export default async function OrderDetailPage({
                           isPast
                             ? 'bg-green-400'
                             : isCurrent
-                            ? 'bg-white'
-                            : 'bg-neutral-700'
+                            ? 'bg-foreground'
+                            : 'bg-muted-foreground/30'
                         }`}
                       />
                       <span
                         className={`text-[10px] font-medium text-center leading-tight ${
                           isCurrent
-                            ? 'text-neutral-50'
+                            ? 'text-foreground'
                             : isPast
-                            ? 'text-green-400'
-                            : 'text-neutral-600'
+                            ? 'text-green-500'
+                            : 'text-muted-foreground/60'
                         }`}
                       >
                         {ORDER_STATUS_LABEL[step]}
@@ -160,7 +160,7 @@ export default async function OrderDetailPage({
                     {idx < STATUS_TIMELINE.length - 1 && (
                       <div
                         className={`flex-1 h-px ${
-                          idx < currentStatusIdx ? 'bg-green-400/50' : 'bg-neutral-700'
+                          idx < currentStatusIdx ? 'bg-green-400/50' : 'bg-muted-foreground/20'
                         }`}
                       />
                     )}
@@ -176,7 +176,7 @@ export default async function OrderDetailPage({
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <Package className="w-4 h-4 text-neutral-400" />
+            <Package className="w-4 h-4 text-muted-foreground" />
             Détail de la commande
           </CardTitle>
         </CardHeader>
@@ -185,24 +185,24 @@ export default async function OrderDetailPage({
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between py-3 border-b border-white/5 last:border-0"
+                className="flex items-center justify-between py-3 border-b border-border/50 last:border-0"
               >
                 <div>
-                  <p className="text-sm font-medium text-neutral-200">
+                  <p className="text-sm font-medium text-foreground/80">
                     {item.product_name_snapshot}
                   </p>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-muted-foreground">
                     {formatCents(item.unit_price_cents)} × {item.quantity}
                   </p>
                 </div>
-                <span className="text-sm font-semibold text-neutral-50">
+                <span className="text-sm font-semibold text-foreground">
                   {formatCents(item.line_total_cents)}
                 </span>
               </div>
             ))}
             <div className="flex items-center justify-between pt-3">
-              <p className="text-base font-semibold text-neutral-50">Total</p>
-              <span className="text-lg font-bold text-neutral-50">
+              <p className="text-base font-semibold text-foreground">Total</p>
+              <span className="text-lg font-bold text-foreground">
                 {formatCents(order.total_cents)}
               </span>
             </div>
@@ -215,19 +215,19 @@ export default async function OrderDetailPage({
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-neutral-400 flex-shrink-0 mt-0.5" />
+              <MapPin className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-neutral-200">
+                <p className="text-sm font-semibold text-foreground/80">
                   Retrait : {entity.name}
                 </p>
-                <p className="text-sm text-neutral-400 mt-1">{entity.pickup_address}</p>
+                <p className="text-sm text-muted-foreground mt-1">{entity.pickup_address}</p>
                 {entity.pickup_instructions && (
-                  <p className="text-xs text-neutral-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {entity.pickup_instructions}
                   </p>
                 )}
                 {catalog?.delivery_date && (
-                  <p className="text-xs text-neutral-500 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     Livraison prévue le {formatDate(catalog.delivery_date)}
                   </p>
                 )}
@@ -242,10 +242,10 @@ export default async function OrderDetailPage({
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
-              <FileText className="w-5 h-5 text-neutral-400 flex-shrink-0 mt-0.5" />
+              <FileText className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-neutral-200">Paiement</p>
+                  <p className="text-sm font-semibold text-foreground/80">Paiement</p>
                   {payment.status === 'paid' ? (
                     <Badge variant="success">
                       <CheckCircle2 className="w-3 h-3 mr-1" />
@@ -257,16 +257,16 @@ export default async function OrderDetailPage({
                     <Badge variant="warning">En attente</Badge>
                   ) : null}
                 </div>
-                <p className="text-sm text-neutral-400 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Montant : {formatCents(payment.amount_cents)}
                 </p>
                 {payment.method && (
-                  <p className="text-xs text-neutral-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Mode : {payment.method}
                   </p>
                 )}
                 {payment.due_at && (
-                  <p className="text-xs text-neutral-500 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     Échéance : {formatDate(payment.due_at)}
                   </p>
                 )}
@@ -280,16 +280,16 @@ export default async function OrderDetailPage({
       {order.notes && (
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
               Notes
             </p>
-            <p className="text-sm text-neutral-300 leading-relaxed">{order.notes}</p>
+            <p className="text-sm text-foreground/70 leading-relaxed">{order.notes}</p>
           </CardContent>
         </Card>
       )}
 
       {/* Placed at */}
-      <p className="text-center text-xs text-neutral-600">
+      <p className="text-center text-xs text-muted-foreground/60">
         Commandé le {formatDate(order.placed_at)}
         {producer ? ` auprès de ${producer.name}` : ''}
       </p>

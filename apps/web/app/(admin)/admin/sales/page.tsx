@@ -267,8 +267,8 @@ export default function AdminSalesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">Admin</p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Rapprochement bancaire</h1>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Admin</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Rapprochement bancaire</h1>
       </div>
 
       {/* Summary chips */}
@@ -294,7 +294,7 @@ export default function AdminSalesPage() {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
         >
           <option value="pending">En attente + retard</option>
           <option value="overdue">En retard seulement</option>
@@ -305,7 +305,7 @@ export default function AdminSalesPage() {
         <select
           value={filterProducer}
           onChange={(e) => setFilterProducer(e.target.value)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
         >
           <option value="">Tous producteurs</option>
           {producers.map((p) => (
@@ -316,7 +316,7 @@ export default function AdminSalesPage() {
         <select
           value={filterEntity}
           onChange={(e) => setFilterEntity(e.target.value)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30 appearance-none cursor-pointer"
         >
           <option value="">Toutes entités</option>
           {entities.map((e) => (
@@ -328,39 +328,39 @@ export default function AdminSalesPage() {
           type="date"
           value={filterFrom}
           onChange={(e) => setFilterFrom(e.target.value)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30"
         />
         <input
           type="date"
           value={filterTo}
           onChange={(e) => setFilterTo(e.target.value)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 focus:outline-none focus:border-white/30"
+          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:border-white/30"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-xl">
         {loading ? (
-          <div className="px-6 py-12 text-center text-sm text-neutral-500">Chargement...</div>
+          <div className="px-6 py-12 text-center text-sm text-muted-foreground">Chargement...</div>
         ) : rows.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-3" />
-            <p className="text-sm text-neutral-400">Aucun paiement pour ces filtres.</p>
+            <p className="text-sm text-muted-foreground">Aucun paiement pour ces filtres.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">N° commande</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Client</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Producteur</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Entité</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Montant</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Échéance</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Âge</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Statut</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">N° commande</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Client</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Producteur</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Entité</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Montant</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Échéance</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Âge</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -368,26 +368,26 @@ export default function AdminSalesPage() {
                   const days = ageDays(row.due_at);
                   return (
                     <tr key={row.payment_id} className="hover:bg-white/[0.03] transition-colors">
-                      <td className="px-4 py-3 text-xs font-mono text-neutral-400">{row.order_number}</td>
-                      <td className="px-4 py-3 text-sm text-neutral-200 font-medium">
+                      <td className="px-4 py-3 text-xs font-mono text-muted-foreground">{row.order_number}</td>
+                      <td className="px-4 py-3 text-sm text-foreground/80 font-medium">
                         {row.client_name}
                         {row.is_client_blocked && (
                           <span className="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400">bloqué</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-neutral-400 hidden lg:table-cell">{row.producer_name}</td>
-                      <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">{row.entity_name}</td>
-                      <td className="px-4 py-3 text-sm font-semibold text-neutral-200">{formatCents(row.amount_cents)}</td>
-                      <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden lg:table-cell">{row.producer_name}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">{row.entity_name}</td>
+                      <td className="px-4 py-3 text-sm font-semibold text-foreground/80">{formatCents(row.amount_cents)}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground hidden md:table-cell">
                         {row.due_at ? formatDateShort(row.due_at) : '—'}
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {row.due_at && row.payment_status !== 'paid' ? (
-                          <span className={`text-xs font-medium ${days > 0 ? 'text-red-400' : 'text-neutral-500'}`}>
+                          <span className={`text-xs font-medium ${days > 0 ? 'text-red-400' : 'text-muted-foreground'}`}>
                             {days > 0 ? `+${days}j` : `${Math.abs(days)}j`}
                           </span>
                         ) : (
-                          <span className="text-neutral-600">—</span>
+                          <span className="text-muted-foreground/60">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={row.payment_status} /></td>
