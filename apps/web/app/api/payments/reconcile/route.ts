@@ -73,30 +73,32 @@ export async function POST(request: NextRequest) {
     if (orderData?.client_id) {
       const clientId: string = orderData.client_id;
 
-      // Vérifier s'il reste des impayés overdue après ce paiement
-      const { count: remainingOverdue } = await supabase
-        .from('payments')
-        .select('id', { count: 'exact', head: true })
-        .in('orders.client_id', [clientId])
-        .in('status', ['overdue'])
-        .neq('id', payment_id);
-
-      // Pour bypasser RLS sur le UPDATE profiles, on utilise le service role
-      // (les admins n'ont pas forcément UPDATE sur profiles.ordering_blocked_until via RLS)
+      // Utiliser le service role pour bypasser RLS
       const serviceClient = createServiceClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       );
 
-      // Vérifier via une query directe les overdue restants du client
-      const { data: clientOverdue } = await serviceClient
-        .from('payments')
-        .select('id, orders!inner(client_id)')
-        .in('status', ['overdue'])
-        .neq('id', payment_id)
-        .eq('orders.client_id', clientId);
+      // Récupérer tous les order_ids du client
+      const { data: clientOrders } = await serviceClient
+        .from('orders')
+        .select('id')
+        .eq('client_id', clientId);
 
-      const hasRemainingOverdue = (clientOverdue?.length ?? 0) > 0;
+      const clientOrderIds = (clientOrders ?? []).map((o) => o.id as string);
+
+      // Vérifier s'il reste des impayés overdue sur ces commandes (hors payment_id venant d'être pointé)
+      let hasRemainingOverdue = false;
+      if (clientOrderIds.length > 0) {
+        const { count } = await serviceClient
+          .from('payments')
+          .select('id', { count: 'exact', head: true })
+          .in('order_id', clientOrderIds)
+          .in('status', ['overdue'])
+          .neq('id', payment_id);
+
+        hasRemainingOverdue = (count ?? 0) > 0;
+      }
 
       if (!hasRemainingOverdue) {
         await serviceClient
@@ -104,9 +106,6 @@ export async function POST(request: NextRequest) {
           .update({ ordering_blocked_until: null, updated_at: new Date().toISOString() })
           .eq('id', clientId);
       }
-
-      // Silence unused var warning
-      void remainingOverdue;
     }
   }
 
