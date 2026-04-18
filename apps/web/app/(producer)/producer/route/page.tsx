@@ -5,11 +5,6 @@ import { createClient } from '@/lib/supabase/server';
 import { ViewAsBanner } from '@/components/admin/ViewAsBanner';
 import { RouteClient } from './RouteClient';
 
-// Fallback coordinates for known producers (used if no lat/lng in entities)
-const PRODUCER_HOME: Record<string, { lat: number; lng: number }> = {
-  'Les Paniers de Nadine': { lat: 43.58, lng: 2.01 },  // Puylaurens
-  'Le Verger de Marc': { lat: 44.01, lng: 4.42 },       // Uzès
-};
 
 export default async function ProducerRoutePage() {
   const ctx = await getProducerContext();
@@ -43,7 +38,7 @@ export default async function ProducerRoutePage() {
 
   const catalogId = openCatalogs?.[0]?.id ?? null;
 
-  let orderCountMap: Map<string, number> = new Map();
+  const orderCountMap: Map<string, number> = new Map();
   if (catalogId) {
     const { data: orders } = await supabase
       .from('orders')
@@ -66,9 +61,6 @@ export default async function ProducerRoutePage() {
     pickup_lat: number | null;
     pickup_lng: number | null;
   };
-
-  // Fallback home lat/lng for this producer
-  const homeFallback = ctx.producerName ? (PRODUCER_HOME[ctx.producerName] ?? null) : null;
 
   const initialEntities = (producerEntities ?? [])
     .map((pe) => {

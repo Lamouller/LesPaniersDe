@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Navigation, Play, Loader2, Route, MapPin } from 'lucide-react';
+import { Play, Loader2, Route, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,7 +38,6 @@ export function RouteClient({ readOnly, initialEntities }: RouteClientProps) {
   const waypoints: Waypoint[] = entities.map((e) => ({ lat: e.lat, lng: e.lng, name: e.name }));
 
   async function handleOptimize(): Promise<OptimizeResult> {
-    const body = { waypoints: entities.map((e) => [e.lng, e.lat]) };
     const res = await fetch('/api/route/optimize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -12,6 +12,19 @@ export function formatCents(cents: number, locale: string = 'fr-FR'): string {
   }).format(cents / 100);
 }
 
+/** "2.50" ou "2,50" → 250 */
+export function euroToCents(euro: string | number): number {
+  const normalized = String(euro).replace(',', '.').trim();
+  const parsed = parseFloat(normalized);
+  if (isNaN(parsed)) return 0;
+  return Math.round(parsed * 100);
+}
+
+/** 250 → "2,50" */
+export function centsToEuro(cents: number): string {
+  return (cents / 100).toFixed(2).replace('.', ',');
+}
+
 export function formatDate(date: Date | string, locale: string = 'fr-FR'): string {
   const d = typeof date === 'string' ? new Date(date) : date;
   return new Intl.DateTimeFormat(locale, {
