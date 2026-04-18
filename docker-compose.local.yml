@@ -69,6 +69,8 @@ services:
       GOTRUE_DISABLE_SIGNUP: "false"
       GOTRUE_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
       GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
       GOTRUE_SMTP_HOST: ${SMTP_HOST:-inbucket}
       GOTRUE_SMTP_PORT: ${SMTP_PORT:-2500}
       GOTRUE_SMTP_USER: ${SMTP_USER:-}
