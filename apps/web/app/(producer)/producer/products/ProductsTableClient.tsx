@@ -267,16 +267,19 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
         <div className="absolute top-2 right-2">
           <button
             type="button"
+            role="switch"
+            aria-checked={isActive}
             onClick={() => { void handleToggle(); }}
             disabled={readOnly || toggling}
             aria-label={isActive ? 'Désactiver' : 'Activer'}
-            className={`w-10 h-5 rounded-full transition-colors duration-200 relative flex-shrink-0 shadow-md
-              ${isActive ? 'bg-primary' : 'bg-neutral-700'}
-              disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={`inline-flex items-center h-6 w-11 rounded-full transition-colors duration-200 shadow-md ring-1 ring-black/10
+              ${isActive ? 'bg-primary' : 'bg-neutral-500/60'}
+              disabled:opacity-50 disabled:cursor-not-allowed
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50`}
           >
             <span
-              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
-                ${isActive ? 'translate-x-5' : 'translate-x-0.5'}`}
+              className={`block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200
+                ${isActive ? 'translate-x-[22px]' : 'translate-x-0.5'}`}
             />
           </button>
         </div>
