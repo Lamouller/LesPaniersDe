@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { getProducerContext } from '@/lib/auth/producer-context';
 import { z } from 'zod';
 
 const addSchema = z.object({
@@ -32,6 +33,11 @@ async function getAdminUser(supabase: Awaited<ReturnType<typeof createClient>>) 
 }
 
 export async function POST(request: NextRequest) {
+  const ctx = await getProducerContext();
+  if (ctx.isReadOnly) {
+    return NextResponse.json({ error: 'Read-only mode (view-as-producer)' }, { status: 403 });
+  }
+
   const supabase = await createClient();
   const user = await getAdminUser(supabase);
   if (!user) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
@@ -65,6 +71,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const ctx = await getProducerContext();
+  if (ctx.isReadOnly) {
+    return NextResponse.json({ error: 'Read-only mode (view-as-producer)' }, { status: 403 });
+  }
+
   const supabase = await createClient();
   const user = await getAdminUser(supabase);
   if (!user) return NextResponse.json({ error: 'forbidden' }, { status: 403 });

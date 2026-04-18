@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
 import { formatCents } from '@/lib/utils';
 import Link from 'next/link';
+import { ViewAsButton } from '@/components/admin/ViewAsButton';
 
 interface ProducerRow {
   id: string;
@@ -147,12 +148,15 @@ export default function AdminProducersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link href={`/admin/producers/${producer.id}`}>
-                      <Button type="button" size="sm" variant="secondary">
-                        <Pencil className="w-3.5 h-3.5" />
-                        Modifier
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <ViewAsButton producerId={producer.id} />
+                      <Link href={`/admin/producers/${producer.id}`}>
+                        <Button type="button" size="sm" variant="secondary">
+                          <Pencil className="w-3.5 h-3.5" />
+                          Modifier
+                        </Button>
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
