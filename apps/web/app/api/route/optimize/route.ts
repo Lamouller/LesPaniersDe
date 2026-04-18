@@ -8,8 +8,8 @@ const bodySchema = z.object({
 
 interface Entity {
   id: string;
-  lat: number | null;
-  lng: number | null;
+  pickup_lat: number | null;
+  pickup_lng: number | null;
   name: string;
 }
 
@@ -53,20 +53,22 @@ export async function POST(request: NextRequest) {
   // Fetch entity coordinates
   const { data: entities, error: dbError } = await supabase
     .from('entities')
-    .select('id, name, lat, lng')
+    .select('id, name, pickup_lat, pickup_lng')
     .in('id', entity_ids);
 
   if (dbError) {
     return NextResponse.json({ error: dbError.message }, { status: 500 });
   }
 
-  const validEntities = (entities as Entity[]).filter((e) => e.lat !== null && e.lng !== null);
+  const validEntities = (entities as Entity[]).filter(
+    (e) => e.pickup_lat !== null && e.pickup_lng !== null
+  );
   if (validEntities.length < 1) {
     return NextResponse.json({ error: 'no_coordinates' }, { status: 422 });
   }
 
   // Build OSRM coordinates string: lng,lat;lng,lat
-  const coordStr = validEntities.map((e) => `${e.lng},${e.lat}`).join(';');
+  const coordStr = validEntities.map((e) => `${e.pickup_lng},${e.pickup_lat}`).join(';');
   const osrmBase = process.env.OSRM_URL ?? 'http://router.project-osrm.org';
   const osrmUrl = `${osrmBase}/trip/v1/driving/${coordStr}?overview=simplified&geometries=geojson&roundtrip=true&steps=false`;
 
