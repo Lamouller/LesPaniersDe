@@ -232,19 +232,25 @@ function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: Pro
   const priceCls =
     'w-full pl-3 pr-8 py-2 text-2xl font-bold text-primary bg-white/5 border border-border rounded-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
+  const [imgError, setImgError] = useState(false);
+  const showFallback = !product.photo_url || imgError;
+
   return (
     <div className="group relative bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-xl hover:border-white/20 hover:bg-white/[0.07] transition-all duration-300">
       {/* Photo zone */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        {product.photo_url ? (
+      <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${KIND_BG[product.kind]}`}>
+        {!showFallback && (
           <img
-            src={product.photo_url}
-            alt={product.name}
+            src={product.photo_url!}
+            alt=""
+            aria-hidden="true"
             loading="lazy"
+            onError={() => setImgError(true)}
             className="w-full h-full object-cover"
           />
-        ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${KIND_BG[product.kind]} flex items-center justify-center`}>
+        )}
+        {showFallback && (
+          <div className="w-full h-full flex items-center justify-center">
             <KindIcon kind={product.kind} className={`w-16 h-16 ${KIND_ICON_COLOR[product.kind]}`} />
           </div>
         )}
