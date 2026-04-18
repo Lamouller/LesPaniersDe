@@ -17,10 +17,17 @@
   --border-subtle: #262626;
   --border-default: #404040;
   --border-strong: #525252;
+
+  --background: 10 10 10;
+  --foreground: 245 245 245;
+  --muted: 30 30 30;
+  --glass: 255 255 255 / 0.05;
+  --glass-border: 255 255 255 / 0.10;
 }
 
-/* Light mode */
-.light {
+/* Light mode — via .light class OR .dark absence (controlled by ThemeToggle) */
+.light,
+html:not(.dark) {
   --bg-base: #ffffff;
   --bg-surface: #fafafa;
   --bg-elevated: #f5f5f5;
@@ -34,6 +41,35 @@
   --border-subtle: #e5e5e5;
   --border-default: #d4d4d4;
   --border-strong: #a3a3a3;
+
+  --background: 255 255 255;
+  --foreground: 10 10 10;
+  --muted: 240 240 240;
+  --glass: 0 0 0 / 0.04;
+  --glass-border: 0 0 0 / 0.08;
+}
+
+/* Dark mode — via .dark class */
+.dark {
+  --bg-base: #0a0a0a;
+  --bg-surface: #141414;
+  --bg-elevated: #1e1e1e;
+  --bg-overlay: #2a2a2a;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #737373;
+  --text-disabled: #525252;
+
+  --border-subtle: #262626;
+  --border-default: #404040;
+  --border-strong: #525252;
+
+  --background: 10 10 10;
+  --foreground: 245 245 245;
+  --muted: 30 30 30;
+  --glass: 255 255 255 / 0.05;
+  --glass-border: 255 255 255 / 0.10;
 }
 
 /* Reset */

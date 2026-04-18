@@ -1,16 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
-import { createServerClient } from '@supabase/ssr';
 
 const PROTECTED_ADMIN = ['/admin'];
 const PROTECTED_CLIENT = ['/account', '/shop'];
 const PROTECTED_PRODUCER = ['/producer'];
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   // Supabase SSR session refresh
   const { response, supabase } = await updateSession(request);
-
-  const { pathname } = request.nextUrl;
 
   // Locale handling via cookie
   const localeCookie = request.cookies.get('NEXT_LOCALE');

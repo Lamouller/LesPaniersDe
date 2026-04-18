@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-white text-black shadow-lg shadow-white/10 hover:bg-neutral-200 focus-visible:ring-white/30 focus-visible:ring-offset-neutral-900',
+          'bg-neutral-950 dark:bg-white text-white dark:text-black shadow-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 focus-visible:ring-neutral-950/30 dark:focus-visible:ring-white/30 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900',
         secondary:
-          'bg-white/5 text-neutral-200 border border-white/10 hover:bg-white/10 hover:border-white/20 focus-visible:ring-white/20 focus-visible:ring-offset-neutral-900',
+          'bg-black/5 dark:bg-white/5 text-neutral-900 dark:text-neutral-200 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 focus-visible:ring-black/20 dark:focus-visible:ring-white/20 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900',
         ghost:
-          'text-neutral-400 hover:bg-white/5 hover:text-neutral-200 focus-visible:ring-white/10',
+          'text-neutral-600 dark:text-neutral-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-neutral-200 focus-visible:ring-black/10 dark:focus-visible:ring-white/10',
         destructive:
-          'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 focus-visible:ring-red-500/30',
+          'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 focus-visible:ring-red-500/30',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs rounded-lg gap-1.5',
