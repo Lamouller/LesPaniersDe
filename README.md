@@ -6,13 +6,33 @@
 
 ---
 
-## Captures d'écran
+## Aperçu
 
-> _Screenshots à venir — Phase 2_
+### Page d'accueil
+![Landing — light](docs/screenshots/01-landing-light.png)
 
-```
-[Catalogue hebdo]   [Tableau de bord producteur]   [Optimisation tournée]
-```
+<details>
+<summary>Version dark</summary>
+
+![Landing — dark](docs/screenshots/02-landing-dark.png)
+</details>
+
+### Espace client
+| Catalogue hebdo | Tableau de bord | Stats & badges |
+|---|---|---|
+| ![Shop](docs/screenshots/10-shop.png) | ![Account](docs/screenshots/12-account.png) | ![Stats](docs/screenshots/13-account-stats.png) |
+
+![Communauté — leaderboard + challenge collectif](docs/screenshots/14-account-community.png)
+
+### Espace admin
+| Dashboard | Rapprochement bancaire | Prévisionnel |
+|---|---|---|
+| ![Admin dashboard](docs/screenshots/20-admin-dashboard.png) | ![Admin sales](docs/screenshots/21-admin-sales.png) | ![Admin forecast](docs/screenshots/22-admin-forecast.png) |
+
+### Espace producteur
+| Dashboard | Prévisionnel CA | Catalogue hebdo |
+|---|---|---|
+| ![Producer dashboard](docs/screenshots/30-producer-dashboard.png) | ![Producer forecast](docs/screenshots/31-producer-forecast.png) | ![Producer catalog](docs/screenshots/32-producer-catalog.png) |
 
 ---
 

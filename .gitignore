@@ -84,3 +84,7 @@ logs/
 *.pid
 *.seed
 *.pid.lock
+
+# Screenshots tooling
+tooling/screenshots/node_modules/
+tooling/screenshots/package-lock.json

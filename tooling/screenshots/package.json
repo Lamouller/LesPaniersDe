@@ -1,0 +1,9 @@
+{
+  "name": "lpd-screenshots",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}

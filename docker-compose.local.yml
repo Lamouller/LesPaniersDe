@@ -300,16 +300,18 @@ services:
     networks:
       - lespaniersde_internal
 
-  # ─── OSRM (routage voiture — France entière) ─────────────────
-  # Données pré-traitées dans deploy/osrm/data/ (gitignored, ~4 GB)
-  # Pré-traitement : voir deploy/osrm/README (extract → partition → customize)
+  # ─── OSRM (routage voiture — Occitanie) ───────────────────────
+  # Données pré-traitées dans deploy/osrm/data/ (gitignored)
+  # Région Occitanie (Toulouse, Montpellier, Nîmes…) — ~700 MB, ~4 GB RAM pic
+  # France entière demande 16+ GB RAM sur Mac ARM (émulation amd64) → OOM
+  # Pré-traitement : extract → partition → customize
   osrm:
     image: osrm/osrm-backend:latest
     container_name: lespaniersde-osrm
     restart: unless-stopped
     volumes:
       - ./deploy/osrm/data:/data:ro
-    command: osrm-routed --algorithm mld --max-matching-size 100 /data/france-latest.osrm
+    command: osrm-routed --algorithm mld --max-matching-size 100 /data/occitanie-latest.osrm
     ports:
       - "127.0.0.1:5001:5000"
     networks:
