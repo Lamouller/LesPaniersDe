@@ -1,22 +1,74 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bell, MessageCircle, Mail, Smartphone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, MessageCircle, Mail, Smartphone, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { createClient } from '@/lib/supabase/client';
 
 export default function PreferencesPage() {
   const [allergies, setAllergies] = useState('');
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifWhatsapp, setNotifWhatsapp] = useState(false);
   const [notifPush, setNotifPush] = useState(false);
-  const [saved, setSaved] = useState(false);
 
-  function handleSave() {
-    // TODO: save to Supabase profiles table
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  // Community
+  const [leaderboardOptIn, setLeaderboardOptIn] = useState(false);
+  const [publicDisplayName, setPublicDisplayName] = useState('');
+
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Load current profile values on mount
+  useEffect(() => {
+    async function loadProfile() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('dietary_preferences, notification_channels, leaderboard_opt_in, public_display_name')
+        .eq('id', user.id)
+        .single();
+
+      if (data) {
+        const diet = data.dietary_preferences as Record<string, unknown>;
+        if (typeof diet?.allergies === 'string') setAllergies(diet.allergies as string);
+        const notif = data.notification_channels as Record<string, boolean> | null;
+        if (notif) {
+          setNotifEmail(notif.email ?? true);
+          setNotifWhatsapp(notif.whatsapp ?? false);
+          setNotifPush(notif.push ?? false);
+        }
+        setLeaderboardOptIn(data.leaderboard_opt_in ?? false);
+        setPublicDisplayName(data.public_display_name ?? '');
+      }
+    }
+    loadProfile();
+  }, []);
+
+  async function handleSave() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/profile/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dietary_preferences: { allergies },
+          notification_channels: { email: notifEmail, whatsapp: notifWhatsapp, push: notifPush },
+          leaderboard_opt_in: leaderboardOptIn,
+          public_display_name: leaderboardOptIn ? publicDisplayName || null : null,
+        }),
+      });
+      if (res.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2500);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -94,9 +146,67 @@ export default function PreferencesPage() {
         </CardContent>
       </Card>
 
+      {/* Communauté / Leaderboard */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="w-4 h-4 text-neutral-400" />
+            Communauté
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* Toggle opt-in */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-neutral-200">Participer au classement</p>
+              <p className="text-xs text-neutral-600 mt-0.5 leading-relaxed">
+                Votre pseudo sera visible dans le classement de votre espace. Vous pouvez vous
+                désinscrire à tout moment (consentement RGPD).
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setLeaderboardOptIn(!leaderboardOptIn)}
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/20 flex-shrink-0 ${
+                leaderboardOptIn ? 'bg-white' : 'bg-white/10'
+              }`}
+              aria-checked={leaderboardOptIn}
+              role="switch"
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform duration-200 ${
+                  leaderboardOptIn ? 'bg-black translate-x-5' : 'bg-neutral-400 translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Public display name (visible only when opt-in) */}
+          {leaderboardOptIn && (
+            <div className="space-y-1.5">
+              <label htmlFor="public_display_name" className="text-sm font-medium text-neutral-300 block">
+                Pseudo public
+              </label>
+              <input
+                id="public_display_name"
+                type="text"
+                value={publicDisplayName}
+                onChange={(e) => setPublicDisplayName(e.target.value)}
+                placeholder="Ex: Alice veggie"
+                maxLength={40}
+                className="w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-50 placeholder:text-neutral-600 transition-all duration-200 focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 hover:border-white/20"
+              />
+              <p className="text-xs text-neutral-500">
+                Ce pseudo remplace votre nom dans le classement.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="flex items-center justify-between">
-        <Button onClick={handleSave} type="button">
-          {saved ? 'Enregistré !' : 'Enregistrer'}
+        <Button onClick={handleSave} type="button" disabled={loading}>
+          {loading ? 'Enregistrement...' : saved ? 'Enregistré !' : 'Enregistrer'}
         </Button>
         {saved && <p className="text-sm text-green-400">Préférences mises à jour</p>}
       </div>

@@ -1,11 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShoppingBasket, User, Truck, Settings } from 'lucide-react';
+import { ShoppingBasket, User, Truck, Settings, BarChart2, Users } from 'lucide-react';
 
 const clientNav = [
   { href: '/shop', label: 'Boutique', icon: ShoppingBasket },
   { href: '/account', label: 'Mon compte', icon: User },
   { href: '/account/deliveries', label: 'Mes retraits', icon: Truck },
+  { href: '/account/stats', label: 'Stats', icon: BarChart2 },
+  { href: '/account/community', label: 'Communauté', icon: Users },
   { href: '/account/preferences', label: 'Préférences', icon: Settings },
 ];
 
