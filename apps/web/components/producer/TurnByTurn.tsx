@@ -153,11 +153,11 @@ export function TurnByTurn({
           <p className="text-2xl font-bold text-amber-400 leading-none tabular-nums">
             {fmtDistance(distanceToNextStep)}
           </p>
-          <p className="text-4xl md:text-5xl font-bold text-white leading-tight mt-0.5 truncate">
+          <p className="text-2xl landscape:text-2xl md:text-4xl font-bold text-white leading-tight mt-1 break-words hyphens-auto">
             {maneuverText(currentStep)}
           </p>
           {nextStep && (
-            <p className="text-sm text-zinc-400 mt-1 truncate">
+            <p className="text-xs text-zinc-400 mt-2 line-clamp-2 leading-snug">
               Ensuite : {maneuverText(nextStep)}
             </p>
           )}

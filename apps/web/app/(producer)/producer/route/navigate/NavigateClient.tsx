@@ -102,7 +102,6 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
   const [steps, setSteps] = useState<NavStep[]>([]);
   const [totalDurationS, setTotalDurationS] = useState(0);
   const [totalDistanceM, setTotalDistanceM] = useState(0);
-  void setPolyline; void setWaypoints; void setSteps; void setTotalDurationS; void setTotalDistanceM;
 
   const [currentPos, setCurrentPos] = useState<CurrentPos | undefined>();
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
@@ -179,6 +178,48 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => document.removeEventListener('visibilitychange', onVisibilityChange);
   }, [navState, requestWakeLock]);
+
+  // Chargement polyline + steps au mount : récupère entités servies par le producer
+  // et appelle /api/route/navigate pour avoir la trajectoire OSRM avec steps
+  useEffect(() => {
+    let cancelled = false;
+    async function loadRoute() {
+      try {
+        const entRes = await fetch('/api/route/navigate-context', { credentials: 'same-origin' });
+        if (!entRes.ok) return;
+        const entData = (await entRes.json()) as {
+          entity_ids: string[];
+          waypoints: NavWaypoint[];
+        };
+        if (cancelled || !entData.entity_ids || entData.entity_ids.length < 2) return;
+
+        const navRes = await fetch('/api/route/navigate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entity_ids: entData.entity_ids }),
+        });
+        if (!navRes.ok) return;
+        const navData = (await navRes.json()) as {
+          polyline: [number, number][];
+          steps: NavStep[];
+          total_distance_m: number;
+          total_duration_s: number;
+        };
+        if (cancelled) return;
+        setPolyline(navData.polyline ?? []);
+        setSteps(navData.steps ?? []);
+        setWaypoints(entData.waypoints ?? []);
+        setTotalDistanceM(navData.total_distance_m ?? 0);
+        setTotalDurationS(navData.total_duration_s ?? 0);
+        setDistanceRemaining(navData.total_distance_m ?? 0);
+        setDurationRemaining(navData.total_duration_s ?? 0);
+      } catch {
+        // fail silently — user will see empty map
+      }
+    }
+    void loadRoute();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleGpsUpdate = useCallback(
     (pos: GeolocationPosition) => {
@@ -454,7 +495,7 @@ export function NavigateClient({ deliveryId, catalogId }: NavigateClientProps) {
 
   // ─── IDLE / LOADING / ERROR — standard layout ────────────────────────────────
   return (
-    <div className="fixed inset-0 bg-zinc-950 flex flex-col" style={{ height: '100dvh' }}>
+    <div className="fixed inset-0 z-50 bg-zinc-950 flex flex-col" style={{ height: '100dvh' }}>
       {/* Map — full screen */}
       <div className="flex-1 relative">
         {polyline.length === 0 && (
