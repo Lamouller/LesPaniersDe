@@ -1,54 +1,132 @@
-import React from 'react';
-import { Building2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+'use client';
 
-const ENTITIES = [
-  { id: '1', name: 'Open Space du Centre', city: 'Lyon 2e', address: '12 rue des Entrepreneurs', members: 18, active: true },
-  { id: '2', name: 'Coworking Nord', city: 'Lyon 4e', address: '45 avenue des Travailleurs', members: 12, active: true },
-  { id: '3', name: 'Bureau Confluence', city: 'Lyon 2e', address: '8 place Nautique', members: 6, active: false },
-];
+import React, { useState, useEffect, useCallback } from 'react';
+import { Building2, Plus, Pencil } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
+
+interface EntityRow {
+  id: string;
+  name: string;
+  slug: string;
+  address: string | null;
+  pickup_address: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  is_active: boolean;
+  member_count: number;
+}
 
 export default function AdminEntitiesPage() {
+  const [entities, setEntities] = useState<EntityRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const supabase = createClient();
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+
+    const { data: entData } = await supabase
+      .from('entities')
+      .select('id, name, slug, address, pickup_address, contact_email, contact_phone, is_active')
+      .order('name', { ascending: true });
+
+    // Member count per entity
+    const { data: profileCounts } = await supabase
+      .from('profiles')
+      .select('entity_id')
+      .not('entity_id', 'is', null);
+
+    const countMap = new Map<string, number>();
+    (profileCounts ?? []).forEach((p) => {
+      if (p.entity_id) {
+        countMap.set(p.entity_id, (countMap.get(p.entity_id) ?? 0) + 1);
+      }
+    });
+
+    const rows: EntityRow[] = (entData ?? []).map((e) => ({
+      ...e,
+      member_count: countMap.get(e.id) ?? 0,
+    }));
+
+    setEntities(rows);
+    setLoading(false);
+  }, [supabase]);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <Building2 className="w-5 h-5 text-neutral-400" />
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Entités</h1>
-            <p className="text-sm text-neutral-500">{ENTITIES.length} points de retrait</p>
+            <p className="text-sm text-neutral-500">{entities.length} points de retrait</p>
           </div>
         </div>
-        <Button size="sm" className="gap-2">
-          <Plus className="w-4 h-4" />
-          Ajouter
-        </Button>
+        <Link href="/admin/entities/new">
+          <Button size="sm">
+            <Plus className="w-4 h-4" />
+            Créer
+          </Button>
+        </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ENTITIES.map((entity) => (
-          <div
-            key={entity.id}
-            className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:bg-white/[0.07] hover:border-white/15 transition-all duration-300"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-neutral-400" />
-              </div>
-              <Badge variant={entity.active ? 'success' : 'default'}>
-                {entity.active ? 'Actif' : 'Inactif'}
-              </Badge>
-            </div>
-            <h3 className="text-sm font-semibold text-neutral-50 mb-1">{entity.name}</h3>
-            <p className="text-xs text-neutral-500 mb-3">{entity.address} — {entity.city}</p>
-            <p className="text-xs text-neutral-600">{entity.members} membres inscrits</p>
-            <div className="flex gap-2 mt-4">
-              <Button size="sm" variant="ghost" className="flex-1">Modifier</Button>
-            </div>
-          </div>
-        ))}
-      </div>
+      {loading ? (
+        <div className="text-center py-12 text-sm text-neutral-500">Chargement...</div>
+      ) : (
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Nom</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Adresse</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden lg:table-cell">Contact</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider hidden md:table-cell">Membres</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-400 uppercase tracking-wider">Statut</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {entities.map((entity) => (
+                <tr key={entity.id} className="hover:bg-white/[0.03] transition-colors">
+                  <td className="px-4 py-3">
+                    <p className="text-sm font-medium text-neutral-200">{entity.name}</p>
+                    <p className="text-xs text-neutral-600 font-mono">{entity.slug}</p>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-neutral-500 hidden md:table-cell">
+                    {entity.pickup_address ?? entity.address ?? '—'}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-neutral-500 hidden lg:table-cell">
+                    {entity.contact_email ?? '—'}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-neutral-400 hidden md:table-cell">
+                    {entity.member_count}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge variant={entity.is_active ? 'success' : 'default'}>
+                      {entity.is_active ? 'Actif' : 'Inactif'}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link href={`/admin/entities/${entity.id}`}>
+                      <Button type="button" size="sm" variant="secondary">
+                        <Pencil className="w-3.5 h-3.5" />
+                        Modifier
+                      </Button>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
