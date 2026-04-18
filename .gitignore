@@ -64,7 +64,7 @@ deploy/osrm/data/*.osrm.*
 .Trashes
 ehthumbs.db
 Thumbs.db
-Icon?
+# (ancien "Icon?" retiré : matchait trop large incl. icon-*.png)
 
 # ─── Tests ───────────────────────────────────────────────────────────────────
 coverage/
