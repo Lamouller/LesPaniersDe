@@ -152,8 +152,8 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500 mb-1">Vue globale</p>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Dashboard admin</h1>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">Vue globale</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Dashboard admin</h1>
       </div>
 
       {/* KPIs */}
@@ -161,48 +161,48 @@ export default async function AdminDashboardPage() {
         {kpis.map((kpi) => (
           <div
             key={kpi.label}
-            className={`bg-white/5 backdrop-blur-xl border rounded-2xl p-5 shadow-xl ${kpi.alert ? 'border-red-500/20 bg-red-500/5' : 'border-white/10'}`}
+            className={`bg-background/50 dark:bg-white/5 backdrop-blur-xl border rounded-2xl p-5 shadow-sm ${kpi.alert ? 'border-destructive/20 bg-destructive/5' : 'border-border'}`}
           >
             <div className="flex items-start justify-between mb-3">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${kpi.alert ? 'bg-red-500/10' : 'bg-white/5 border border-white/10'}`}>
-                <kpi.icon className={`w-4 h-4 ${kpi.alert ? 'text-red-400' : 'text-neutral-400'}`} />
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${kpi.alert ? 'bg-destructive/10' : 'bg-muted border border-border'}`}>
+                <kpi.icon className={`w-4 h-4 ${kpi.alert ? 'text-destructive' : 'text-muted-foreground'}`} />
               </div>
             </div>
-            <p className={`text-2xl font-bold mb-1 ${kpi.alert ? 'text-red-300' : 'text-neutral-50'}`}>
+            <p className={`text-2xl font-bold mb-1 ${kpi.alert ? 'text-destructive' : 'text-foreground'}`}>
               {kpi.value}
             </p>
-            <p className="text-xs text-neutral-500">{kpi.label}</p>
-            <p className={`text-xs mt-1 ${kpi.alert ? 'text-red-500' : 'text-neutral-600'}`}>{kpi.sub}</p>
+            <p className="text-xs text-muted-foreground">{kpi.label}</p>
+            <p className={`text-xs mt-1 ${kpi.alert ? 'text-destructive/70' : 'text-muted-foreground/60'}`}>{kpi.sub}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Alertes impayés */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl p-5">
+        <div className="bg-background/50 dark:bg-white/5 backdrop-blur-xl border border-border rounded-2xl shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-neutral-300 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400" />
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive" />
               Impayés overdue
             </h2>
             <Link
               href="/admin/sales"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Voir tout
             </Link>
           </div>
           {alerts.overduePayments.length === 0 ? (
-            <p className="text-sm text-neutral-600">Aucun impayé en retard.</p>
+            <p className="text-sm text-muted-foreground/60">Aucun impayé en retard.</p>
           ) : (
             <div className="space-y-2">
               {alerts.overduePayments.map((p) => (
-                <div key={p.payment_id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                <div key={p.payment_id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                   <div>
-                    <p className="text-sm font-medium text-neutral-200">{p.client_name}</p>
-                    <p className="text-xs text-neutral-500">{p.order_number} · échu le {p.due_at ? formatDateShort(p.due_at) : '—'}</p>
+                    <p className="text-sm font-medium text-foreground">{p.client_name}</p>
+                    <p className="text-xs text-muted-foreground">{p.order_number} · échu le {p.due_at ? formatDateShort(p.due_at) : '—'}</p>
                   </div>
-                  <span className="text-sm font-semibold text-red-300">{formatCents(p.amount_cents)}</span>
+                  <span className="text-sm font-semibold text-destructive">{formatCents(p.amount_cents)}</span>
                 </div>
               ))}
             </div>
@@ -210,27 +210,27 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Clients bloqués */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl p-5">
+        <div className="bg-background/50 dark:bg-white/5 backdrop-blur-xl border border-border rounded-2xl shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-neutral-300 flex items-center gap-2">
-              <UserX className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <UserX className="w-4 h-4 text-warning" />
               Clients bloqués
             </h2>
             <Link
               href="/admin/users"
-              className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
               Voir tout
             </Link>
           </div>
           {alerts.blockedProfiles.length === 0 ? (
-            <p className="text-sm text-neutral-600">Aucun client bloqué.</p>
+            <p className="text-sm text-muted-foreground/60">Aucun client bloqué.</p>
           ) : (
             <div className="space-y-2">
               {alerts.blockedProfiles.map((profile) => (
-                <div key={profile.id} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                  <p className="text-sm font-medium text-neutral-200">{profile.full_name}</p>
-                  <p className="text-xs text-amber-400">
+                <div key={profile.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+                  <p className="text-sm font-medium text-foreground">{profile.full_name}</p>
+                  <p className="text-xs text-warning">
                     jusqu&apos;au {profile.ordering_blocked_until ? formatDateShort(profile.ordering_blocked_until) : '—'}
                   </p>
                 </div>
@@ -243,28 +243,28 @@ export default async function AdminDashboardPage() {
       {/* Activité récente */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Dernières commandes */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-          <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
-            <ShoppingBasket className="w-4 h-4 text-neutral-400" />
-            <h2 className="text-sm font-semibold text-neutral-300">Dernières commandes</h2>
+        <div className="bg-background/50 dark:bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+            <ShoppingBasket className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold text-foreground">Dernières commandes</h2>
           </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">N°</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Client</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Montant</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Statut</th>
+              <tr className="border-b border-border">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">N°</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Client</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Montant</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Statut</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border/50">
               {activity.recentOrders.map((order) => {
                 const clientName = (order as { profiles?: { full_name?: string } | null }).profiles?.full_name ?? '—';
                 return (
-                  <tr key={order.id} className="hover:bg-white/[0.03] transition-colors">
-                    <td className="px-4 py-2.5 text-xs font-mono text-neutral-400">{order.order_number}</td>
-                    <td className="px-4 py-2.5 text-xs text-neutral-300 hidden md:table-cell">{clientName}</td>
-                    <td className="px-4 py-2.5 text-xs font-semibold text-neutral-200">{formatCents(order.total_cents)}</td>
+                  <tr key={order.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-2.5 text-xs font-mono text-muted-foreground">{order.order_number}</td>
+                    <td className="px-4 py-2.5 text-xs text-foreground hidden md:table-cell">{clientName}</td>
+                    <td className="px-4 py-2.5 text-xs font-semibold text-foreground">{formatCents(order.total_cents)}</td>
                     <td className="px-4 py-2.5"><StatusBadge status={order.status} /></td>
                   </tr>
                 );
@@ -274,35 +274,35 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Derniers paiements pointés */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl">
-          <div className="px-5 py-4 border-b border-white/10 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-400" />
-            <h2 className="text-sm font-semibold text-neutral-300">Derniers paiements pointés</h2>
+        <div className="bg-background/50 dark:bg-white/5 backdrop-blur-xl border border-border rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">Derniers paiements pointés</h2>
           </div>
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Client</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Montant</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider hidden md:table-cell">Méthode</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500 uppercase tracking-wider">Date</th>
+              <tr className="border-b border-border">
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Client</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Montant</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Méthode</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-border/50">
               {activity.recentPayments.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-4 text-sm text-neutral-600 text-center">Aucun paiement pointé.</td>
+                  <td colSpan={4} className="px-4 py-4 text-sm text-muted-foreground/60 text-center">Aucun paiement pointé.</td>
                 </tr>
               ) : activity.recentPayments.map((pay) => {
                 const orderData = (pay as { orders?: { order_number?: string; profiles?: { full_name?: string } | null } | null }).orders;
                 const clientName = orderData?.profiles?.full_name ?? '—';
                 const methodLabels: Record<string, string> = { cash: 'Espèces', card: 'CB', transfer: 'Virement', check: 'Chèque' };
                 return (
-                  <tr key={pay.id} className="hover:bg-white/[0.03] transition-colors">
-                    <td className="px-4 py-2.5 text-xs text-neutral-300 hidden md:table-cell">{clientName}</td>
-                    <td className="px-4 py-2.5 text-xs font-semibold text-green-300">{formatCents(pay.amount_cents)}</td>
-                    <td className="px-4 py-2.5 text-xs text-neutral-400 hidden md:table-cell">{pay.method ? (methodLabels[pay.method] ?? pay.method) : '—'}</td>
-                    <td className="px-4 py-2.5 text-xs text-neutral-500">{pay.reconciled_at ? formatDateShort(pay.reconciled_at) : '—'}</td>
+                  <tr key={pay.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-2.5 text-xs text-foreground hidden md:table-cell">{clientName}</td>
+                    <td className="px-4 py-2.5 text-xs font-semibold text-primary">{formatCents(pay.amount_cents)}</td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground hidden md:table-cell">{pay.method ? (methodLabels[pay.method] ?? pay.method) : '—'}</td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{pay.reconciled_at ? formatDateShort(pay.reconciled_at) : '—'}</td>
                   </tr>
                 );
               })}

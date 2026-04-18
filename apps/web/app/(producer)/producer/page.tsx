@@ -115,10 +115,10 @@ export default async function ProducerDashboardPage() {
       {ctx.isViewAs && <ViewAsBanner producerName={ctx.producerName} />}
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
             Semaine en cours
           </p>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Tableau de bord producteur</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Tableau de bord producteur</h1>
         </div>
 
         {/* Alerte capacite si warning ou critical */}
@@ -126,8 +126,8 @@ export default async function ProducerDashboardPage() {
           <div
             className={`mb-6 flex items-start gap-3 px-4 py-3 rounded-xl border ${
               hasCritical
-                ? 'border-red-500/20 bg-red-500/5 text-red-300'
-                : 'border-amber-500/20 bg-amber-500/5 text-amber-300'
+                ? 'border-destructive/20 bg-destructive/5 text-destructive'
+                : 'border-warning/20 bg-warning/5 text-warning'
             }`}
           >
             <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
@@ -158,24 +158,24 @@ export default async function ProducerDashboardPage() {
           {STATS.map((s) => (
             <Card
               key={s.label}
-              className={s.alert ? 'border-red-500/20 bg-red-500/5 hover:bg-red-500/[0.08]' : ''}
+              className={s.alert ? 'border-destructive/20 bg-destructive/5' : ''}
             >
               <CardContent className="pt-6">
                 <div
                   className={`w-9 h-9 rounded-xl flex items-center justify-center mb-3 ${
-                    s.alert ? 'bg-red-500/10' : 'bg-white/5 border border-white/10'
+                    s.alert ? 'bg-destructive/10' : 'bg-muted border border-border'
                   }`}
                 >
-                  <s.icon className={`w-4 h-4 ${s.alert ? 'text-red-400' : 'text-neutral-400'}`} />
+                  <s.icon className={`w-4 h-4 ${s.alert ? 'text-destructive' : 'text-muted-foreground'}`} />
                 </div>
                 <p
                   className={`text-2xl font-bold mb-1 ${
-                    s.alert ? 'text-red-300' : 'text-neutral-50'
+                    s.alert ? 'text-destructive' : 'text-foreground'
                   }`}
                 >
                   {s.value}
                 </p>
-                <p className="text-xs text-neutral-500">{s.label}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
               </CardContent>
             </Card>
           ))}
@@ -185,9 +185,9 @@ export default async function ProducerDashboardPage() {
         <div className="mb-8">
           <Link
             href="/producer/forecast"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-medium text-neutral-300 hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border text-sm font-medium text-foreground hover:bg-muted/80 hover:border-primary/20 transition-all duration-200"
           >
-            <TrendingUp className="w-4 h-4" />
+            <TrendingUp className="w-4 h-4 text-primary" />
             Voir le previsionnel complet
             <ArrowRight className="w-4 h-4" />
           </Link>

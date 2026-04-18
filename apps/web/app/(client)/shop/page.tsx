@@ -46,7 +46,7 @@ export default async function ShopPage() {
   if (!producerEntities || producerEntities.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-neutral-400 text-sm">
+        <p className="text-muted-foreground text-sm">
           Aucun producteur n'est rattaché à votre espace pour l'instant.
         </p>
       </div>
@@ -71,7 +71,7 @@ export default async function ShopPage() {
   if (!catalogs || catalogs.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-neutral-400 text-sm">
+        <p className="text-muted-foreground text-sm">
           Aucun catalogue ouvert cette semaine. Revenez bientôt !
         </p>
       </div>
@@ -119,10 +119,10 @@ export default async function ShopPage() {
           <section key={catalog.id} className="mb-12">
             {/* Header */}
             <div className="mb-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
                 {producerName}
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-neutral-50">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 Catalogue de la semaine
               </h1>
             </div>
@@ -135,15 +135,15 @@ export default async function ShopPage() {
 
             {/* Basket composition */}
             {composition.length > 0 && (
-              <div className="mb-8 p-4 bg-white/[0.03] border border-white/5 rounded-xl">
-                <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-3">
+              <div className="mb-8 p-4 bg-muted/40 border border-border rounded-xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
                   Composition du panier cette semaine
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {composition.map((item, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-400"
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
                     >
                       {item.name} — {item.qty} {item.unit}
                     </span>
@@ -155,7 +155,7 @@ export default async function ShopPage() {
             {/* Paniers */}
             {baskets.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-base font-semibold text-neutral-300 mb-4">Paniers</h2>
+                <h2 className="text-base font-semibold text-foreground mb-4">Paniers</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {baskets.map((wcp) => {
                     const product = wcp.products as unknown as {
@@ -187,7 +187,7 @@ export default async function ShopPage() {
             {/* Options */}
             {options.length > 0 && (
               <div>
-                <h2 className="text-base font-semibold text-neutral-300 mb-4">Options</h2>
+                <h2 className="text-base font-semibold text-foreground mb-4">Options</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {options.map((wcp) => {
                     const product = wcp.products as unknown as {

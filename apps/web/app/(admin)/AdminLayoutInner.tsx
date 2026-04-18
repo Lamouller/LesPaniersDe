@@ -33,18 +33,18 @@ export default function AdminLayoutInner({ children, email, role }: AdminLayoutI
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-neutral-950 flex">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 m-3 w-56 bg-black/5 dark:bg-white/5 backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-2xl shadow-xl flex flex-col z-40 hidden md:flex"
+        className="fixed inset-y-0 left-0 m-3 w-56 bg-background/80 dark:bg-muted/20 backdrop-blur-xl border border-border rounded-2xl shadow-sm flex flex-col z-40 hidden md:flex"
         style={{ height: 'calc(100vh - 1.5rem)' }}
       >
-        <div className="px-4 py-4 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
+        <div className="px-4 py-4 border-b border-border flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-xs flex-shrink-0">
+            <span className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs flex-shrink-0">
               LP
             </span>
-            <span className="text-sm font-bold text-neutral-900 dark:text-neutral-50">Admin</span>
+            <span className="text-sm font-bold text-foreground">Admin</span>
           </Link>
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -61,8 +61,8 @@ export default function AdminLayoutInner({ children, email, role }: AdminLayoutI
                 href={item.href}
                 className={`flex items-center gap-3 px-3 py-2.5 mx-2 mb-0.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   active
-                    ? 'bg-neutral-950 dark:bg-white text-white dark:text-black shadow-lg'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-neutral-200'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
                 style={{ width: 'calc(100% - 1rem)' }}
               >
@@ -73,21 +73,21 @@ export default function AdminLayoutInner({ children, email, role }: AdminLayoutI
           })}
         </nav>
 
-        <div className="px-4 py-3 border-t border-black/10 dark:border-white/10">
-          <p className="text-[10px] text-neutral-500 dark:text-neutral-600 uppercase tracking-widest">
+        <div className="px-4 py-3 border-t border-border">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
             Administration
           </p>
-          <p className="text-[10px] text-neutral-400 dark:text-neutral-700 mt-1">v{APP_VERSION}</p>
+          <p className="text-[10px] text-muted-foreground/50 mt-1">v{APP_VERSION}</p>
         </div>
       </aside>
 
       {/* Mobile top bar */}
-      <div className="fixed top-0 left-0 right-0 z-40 md:hidden px-4 py-3 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-xl border-b border-black/10 dark:border-white/10 flex items-center justify-between gap-3">
+      <div className="fixed top-0 left-0 right-0 z-40 md:hidden px-4 py-3 bg-background/90 backdrop-blur-xl border-b border-border flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="w-7 h-7 rounded-lg bg-neutral-950 dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-xs">
+          <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
             LP
           </span>
-          <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-50">Admin</span>
+          <span className="text-sm font-semibold text-foreground">Admin</span>
         </div>
         <div className="flex items-center gap-1">
           <ThemeToggle />

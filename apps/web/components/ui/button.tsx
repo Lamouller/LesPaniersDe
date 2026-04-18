@@ -9,13 +9,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-neutral-950 dark:bg-white text-white dark:text-black shadow-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 focus-visible:ring-neutral-950/30 dark:focus-visible:ring-white/30 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900',
+          'bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 focus-visible:ring-primary/40 focus-visible:ring-offset-background',
         secondary:
-          'bg-black/5 dark:bg-white/5 text-neutral-900 dark:text-neutral-200 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20 focus-visible:ring-black/20 dark:focus-visible:ring-white/20 focus-visible:ring-offset-white dark:focus-visible:ring-offset-neutral-900',
+          'bg-accent text-accent-foreground border border-accent/20 hover:bg-accent/90 focus-visible:ring-accent/30 focus-visible:ring-offset-background',
         ghost:
-          'text-neutral-600 dark:text-neutral-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-neutral-900 dark:hover:text-neutral-200 focus-visible:ring-black/10 dark:focus-visible:ring-white/10',
+          'text-foreground hover:bg-muted hover:text-foreground focus-visible:ring-border/30',
         destructive:
-          'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-700 dark:hover:text-red-300 focus-visible:ring-red-500/30',
+          'bg-destructive/10 text-destructive border border-destructive/20 hover:bg-destructive/20 focus-visible:ring-destructive/30',
+        outline:
+          'border border-border text-foreground bg-background hover:bg-muted focus-visible:ring-border/30',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs rounded-lg gap-1.5',

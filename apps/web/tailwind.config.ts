@@ -10,29 +10,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: {
-          DEFAULT: 'var(--bg-base)',
-          surface: 'var(--bg-surface)',
-          elevated: 'var(--bg-elevated)',
-          overlay: 'var(--bg-overlay)',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        muted: {
+          DEFAULT: 'rgb(var(--muted) / <alpha-value>)',
+          foreground: 'rgb(var(--muted-foreground) / <alpha-value>)',
         },
-        foreground: {
-          DEFAULT: 'var(--text-primary)',
-          secondary: 'var(--text-secondary)',
-          tertiary: 'var(--text-tertiary)',
-          disabled: 'var(--text-disabled)',
+        primary: {
+          DEFAULT: 'rgb(var(--primary) / <alpha-value>)',
+          foreground: 'rgb(var(--primary-foreground) / <alpha-value>)',
         },
-        border: {
-          DEFAULT: 'var(--border-default)',
-          subtle: 'var(--border-subtle)',
-          strong: 'var(--border-strong)',
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          foreground: 'rgb(var(--accent-foreground) / <alpha-value>)',
         },
-        glass: {
-          DEFAULT: 'rgba(255,255,255,0.05)',
-          hover: 'rgba(255,255,255,0.10)',
-          border: 'rgba(255,255,255,0.10)',
-          'border-hover': 'rgba(255,255,255,0.20)',
-        },
+        border: 'rgb(var(--border) / <alpha-value>)',
+        destructive: 'rgb(var(--destructive) / <alpha-value>)',
+        success: 'rgb(var(--success) / <alpha-value>)',
+        warning: 'rgb(var(--warning) / <alpha-value>)',
+        /* Legacy compat */
+        surface: 'var(--bg-surface)',
+        elevated: 'var(--bg-elevated)',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
@@ -59,8 +57,8 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(255,255,255,0.1)' },
-          '50%': { boxShadow: '0 0 40px rgba(255,255,255,0.2)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(22,163,74,0.12)' },
+          '50%': { boxShadow: '0 0 40px rgba(22,163,74,0.24)' },
         },
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
