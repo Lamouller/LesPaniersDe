@@ -39,6 +39,11 @@ caddy-config/
 osrm-data/
 postgres-data/
 
+# ─── OSRM données cartographiques (trop gros pour git, 4+ GB) ───────────────
+deploy/osrm/data/*.pbf
+deploy/osrm/data/*.osrm
+deploy/osrm/data/*.osrm.*
+
 # ─── IDE / Editeurs ──────────────────────────────────────────────────────────
 .idea/
 .vscode/

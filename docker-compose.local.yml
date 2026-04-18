@@ -286,7 +286,7 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       VAPID_EMAIL: ${VAPID_EMAIL:-}
-      OSRM_URL: ${OSRM_URL:-}
+      OSRM_URL: ${OSRM_URL:-http://osrm:5000}
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
       PAYMENT_REMINDER_DAYS: ${PAYMENT_REMINDER_DAYS:-3}
       PAYMENT_BLOCK_DAYS: ${PAYMENT_BLOCK_DAYS:-7}
@@ -299,6 +299,27 @@ services:
         condition: service_started
     networks:
       - lespaniersde_internal
+
+  # ─── OSRM (routage voiture — France entière) ─────────────────
+  # Données pré-traitées dans deploy/osrm/data/ (gitignored, ~4 GB)
+  # Pré-traitement : voir deploy/osrm/README (extract → partition → customize)
+  osrm:
+    image: osrm/osrm-backend:latest
+    container_name: lespaniersde-osrm
+    restart: unless-stopped
+    volumes:
+      - ./deploy/osrm/data:/data:ro
+    command: osrm-routed --algorithm mld --max-matching-size 100 /data/france-latest.osrm
+    ports:
+      - "127.0.0.1:5001:5000"
+    networks:
+      - lespaniersde_internal
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
 # ─── Réseau dédié (isolé des autres projets) ──────────────────
 networks:
