@@ -9,12 +9,12 @@
 ## Aperçu
 
 ### Page d'accueil
-![Landing — light](docs/screenshots/01-landing-light.png)
+![Landing](docs/screenshots/01-landing.png)
 
 <details>
-<summary>Version dark</summary>
+<summary>Version light</summary>
 
-![Landing — dark](docs/screenshots/02-landing-dark.png)
+![Landing — light](docs/screenshots/01-landing-light.png)
 </details>
 
 ### Espace client
