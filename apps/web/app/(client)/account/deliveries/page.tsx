@@ -1,65 +1,163 @@
 'use client';
 
-import React from 'react';
-import { Truck, MapPin, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { Truck, MapPin, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
-interface DeliveryItem {
+// LiveDeliveryMap — MapLibre GL, no SSR
+const LiveDeliveryMap = dynamic(
+  () => import('@/components/account/LiveDeliveryMap').then((m) => m.LiveDeliveryMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] h-52 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    ),
+  }
+);
+
+interface DeliveryRow {
   id: string;
-  week_start: string;
-  status: 'scheduled' | 'in_progress' | 'completed';
-  producer_name: string;
-  entity_name: string;
-  eta_minutes?: number;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'canceled';
+  started_at: string | null;
+  completed_at: string | null;
+  weekly_catalog_id: string;
 }
 
-// Placeholder data
-const DELIVERIES: DeliveryItem[] = [
-  {
-    id: 'del_1',
-    week_start: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'in_progress',
-    producer_name: 'La Ferme des Collines',
-    entity_name: 'Open Space du Centre',
-    eta_minutes: 10,
-  },
-  {
-    id: 'del_2',
-    week_start: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'scheduled',
-    producer_name: 'La Ferme des Collines',
-    entity_name: 'Open Space du Centre',
-  },
-  {
-    id: 'del_3',
-    week_start: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    status: 'completed',
-    producer_name: 'La Ferme des Collines',
-    entity_name: 'Open Space du Centre',
-  },
-];
+interface CatalogInfo {
+  id: string;
+  week_start: string;
+  producer_name: string | null;
+  producer_id: string | null;
+}
 
-function LiveMapPlaceholder({ eta }: { eta?: number }) {
-  return (
-    <div className="mt-4 rounded-xl overflow-hidden border border-white/10 bg-white/[0.02] h-48 flex flex-col items-center justify-center gap-2 text-neutral-600">
-      <MapPin className="w-8 h-8" />
-      <p className="text-sm font-medium">Carte en direct (Leaflet)</p>
-      <p className="text-xs">
-        {eta ? `Arrive dans environ ${eta} min` : 'Localisation en cours...'}
-      </p>
-      <p className="text-[10px] text-neutral-700 mt-1">
-        Phase 2 — Intégration Leaflet + Supabase Realtime
-      </p>
-    </div>
-  );
+interface DeliveryItem {
+  delivery_id: string;
+  status: 'scheduled' | 'in_progress' | 'completed';
+  week_start: string;
+  producer_name: string;
+  entity_lat: number | null;
+  entity_lng: number | null;
 }
 
 export default function DeliveriesPage() {
-  const inProgress = DELIVERIES.find((d) => d.status === 'in_progress');
-  const upcoming = DELIVERIES.filter((d) => d.status === 'scheduled');
-  const completed = DELIVERIES.filter((d) => d.status === 'completed');
+  const [deliveries, setDeliveries] = useState<DeliveryItem[]>([]);
+  const [entityLat, setEntityLat] = useState<number | null>(null);
+  const [entityLng, setEntityLng] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      // Get user's profile (entity_id)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('entity_id')
+        .eq('id', user.id)
+        .single();
+
+      const entityId = profile?.entity_id as string | null;
+
+      // Get entity coordinates
+      if (entityId) {
+        const { data: entity } = await supabase
+          .from('entities')
+          .select('pickup_lat, pickup_lng')
+          .eq('id', entityId)
+          .single();
+        setEntityLat((entity as { pickup_lat: number | null } | null)?.pickup_lat ?? null);
+        setEntityLng((entity as { pickup_lng: number | null } | null)?.pickup_lng ?? null);
+      }
+
+      // Get orders for this user
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('weekly_catalog_id, producer_id')
+        .eq('client_id', user.id)
+        .neq('status', 'canceled')
+        .order('placed_at', { ascending: false });
+
+      if (!orders || orders.length === 0) { setLoading(false); return; }
+
+      const catalogIds = [...new Set((orders as { weekly_catalog_id: string }[]).map((o) => o.weekly_catalog_id))];
+
+      // Get weekly catalogs info
+      const { data: catalogs } = await supabase
+        .from('weekly_catalogs')
+        .select('id, week_start, producer_id')
+        .in('id', catalogIds)
+        .order('week_start', { ascending: false })
+        .limit(10);
+
+      if (!catalogs || catalogs.length === 0) { setLoading(false); return; }
+
+      // Get producer names
+      const producerIds = [...new Set((catalogs as { producer_id: string }[]).map((c) => c.producer_id))];
+      const { data: producers } = await supabase
+        .from('producers')
+        .select('id, name')
+        .in('id', producerIds);
+
+      const producerMap = new Map<string, string>(
+        (producers ?? []).map((p: { id: string; name: string }) => [p.id, p.name])
+      );
+
+      // Get deliveries for these catalogs
+      const { data: deliveryRows } = await supabase
+        .from('deliveries')
+        .select('id, status, started_at, completed_at, weekly_catalog_id')
+        .in('weekly_catalog_id', catalogIds)
+        .neq('status', 'canceled');
+
+      const deliveryByCatalog = new Map<string, DeliveryRow>(
+        (deliveryRows ?? []).map((d: DeliveryRow) => [d.weekly_catalog_id, d])
+      );
+
+      const items: DeliveryItem[] = (catalogs as CatalogInfo[]).map((cat) => {
+        const delivery = deliveryByCatalog.get(cat.id);
+        return {
+          delivery_id: delivery?.id ?? '',
+          status: (delivery?.status ?? 'scheduled') as DeliveryItem['status'],
+          week_start: cat.week_start,
+          producer_name: producerMap.get(cat.producer_id ?? '') ?? 'Producteur',
+          entity_lat: entityLat,
+          entity_lng: entityLng,
+        };
+      });
+
+      setDeliveries(items);
+      setLoading(false);
+    }
+
+    void load();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update entity coords in items once loaded
+  const itemsWithCoords = deliveries.map((d) => ({
+    ...d,
+    entity_lat: entityLat,
+    entity_lng: entityLng,
+  }));
+
+  const inProgress = itemsWithCoords.find((d) => d.status === 'in_progress');
+  const upcoming = itemsWithCoords.filter((d) => d.status === 'scheduled');
+  const completed = itemsWithCoords.filter((d) => d.status === 'completed');
+
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-8 flex items-center justify-center min-h-48">
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
@@ -82,16 +180,23 @@ export default function DeliveriesPage() {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-neutral-300 mb-1">{inProgress.producer_name}</p>
-            <p className="text-xs text-neutral-500">→ {inProgress.entity_name}</p>
-            {inProgress.eta_minutes && (
-              <div className="flex items-center gap-2 mt-3 px-3 py-2 bg-green-500/10 border border-green-500/20 rounded-xl">
-                <Clock className="w-4 h-4 text-green-400" />
-                <p className="text-sm text-green-400">
-                  Arrive dans environ <strong>{inProgress.eta_minutes} min</strong>
-                </p>
+            <p className="text-xs text-neutral-500">
+              Semaine du {formatDate(inProgress.week_start)}
+            </p>
+
+            {inProgress.delivery_id ? (
+              <LiveDeliveryMap
+                deliveryId={inProgress.delivery_id}
+                producerName={inProgress.producer_name}
+                entityLat={inProgress.entity_lat}
+                entityLng={inProgress.entity_lng}
+              />
+            ) : (
+              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                Position GPS non encore disponible
               </div>
             )}
-            <LiveMapPlaceholder eta={inProgress.eta_minutes} />
           </CardContent>
         </Card>
       )}
@@ -101,14 +206,14 @@ export default function DeliveriesPage() {
         <div>
           <h2 className="text-sm font-semibold text-neutral-400 mb-3">À venir</h2>
           <div className="space-y-3">
-            {upcoming.map((d) => (
-              <Card key={d.id}>
+            {upcoming.map((d, idx) => (
+              <Card key={d.delivery_id || idx}>
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-neutral-200">{d.producer_name}</p>
                       <p className="text-xs text-neutral-500 mt-0.5">
-                        {formatDate(d.week_start)} · {d.entity_name}
+                        Semaine du {formatDate(d.week_start)}
                       </p>
                     </div>
                     <Badge variant="default">Planifié</Badge>
@@ -125,14 +230,14 @@ export default function DeliveriesPage() {
         <div>
           <h2 className="text-sm font-semibold text-neutral-400 mb-3">Historique</h2>
           <div className="space-y-3">
-            {completed.map((d) => (
-              <Card key={d.id} className="opacity-70">
+            {completed.map((d, idx) => (
+              <Card key={d.delivery_id || idx} className="opacity-70">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-neutral-300">{d.producer_name}</p>
                       <p className="text-xs text-neutral-600 mt-0.5">
-                        {formatDate(d.week_start)} · {d.entity_name}
+                        Semaine du {formatDate(d.week_start)}
                       </p>
                     </div>
                     <Badge variant="success">
@@ -144,6 +249,17 @@ export default function DeliveriesPage() {
               </Card>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Vide */}
+      {!loading && deliveries.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+          <MapPin className="w-10 h-10 opacity-30" />
+          <p className="text-sm">Aucune livraison à afficher.</p>
+          <p className="text-xs text-center max-w-xs opacity-70">
+            Vos livraisons apparaîtront ici une fois que vous aurez passé une commande.
+          </p>
         </div>
       )}
     </div>

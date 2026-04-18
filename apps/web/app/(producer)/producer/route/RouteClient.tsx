@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Play, Loader2, Route, MapPin, Fuel, Leaf, TrendingDown, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Play, Loader2, Route, MapPin, Fuel, Leaf, TrendingDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,10 +35,11 @@ interface RouteClientProps {
 }
 
 export function RouteClient({ readOnly, initialEntities, vehicleConfig }: RouteClientProps) {
+  const router = useRouter();
   const [entities, setEntities] = useState<EntityStop[]>(initialEntities);
   const [optimizedOrder, setOptimizedOrder] = useState<number[] | null>(null);
   const [starting, setStarting] = useState(false);
-  const [started, setStarted] = useState(false);
+  const started = false; // Navigation is handled on the navigate page
   const [economics, setEconomics] = useState<RouteEconomics | null>(null);
   const [routeDistanceM, setRouteDistanceM] = useState<number | null>(null);
   const [routeDurationS, setRouteDurationS] = useState<number | null>(null);
@@ -91,10 +93,8 @@ export function RouteClient({ readOnly, initialEntities, vehicleConfig }: RouteC
   async function handleStartTour() {
     if (readOnly) return;
     setStarting(true);
-    // TODO: POST /api/deliveries + activer broadcast GPS
-    await new Promise<void>((r) => setTimeout(r, 800));
-    setStarted(true);
-    setStarting(false);
+    // Navigate to the GPS navigation page
+    router.push('/producer/route/navigate');
   }
 
   return (
