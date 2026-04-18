@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, CreditCard, Users, Building2, Tractor } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Users, Building2, Tractor, TrendingUp } from 'lucide-react';
 
 const adminNav = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -11,6 +11,7 @@ const adminNav = [
   { href: '/admin/users', label: 'Clients', icon: Users },
   { href: '/admin/entities', label: 'Entités', icon: Building2 },
   { href: '/admin/producers', label: 'Producteurs', icon: Tractor },
+  { href: '/admin/forecast', label: 'Prévisionnel', icon: TrendingUp, exact: false },
 ];
 
 const APP_VERSION = '0.1.0';
