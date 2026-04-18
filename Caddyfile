@@ -1,0 +1,90 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LesPaniersDe — Configuration Caddy
+# Caddy gère automatiquement le SSL via Let's Encrypt
+#
+# Variables utilisées (depuis .env) :
+#   {$DOMAIN}       — votre domaine principal (ex: paniersdena.fr)
+#   {$ADMIN_EMAIL}  — email pour Let's Encrypt
+#
+# Après modification, recharger : docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Email pour les notifications Let's Encrypt (expiration de certificat, etc.)
+{
+	email {$ADMIN_EMAIL}
+	# Activer HTTP/3 (QUIC) pour de meilleures performances
+	servers {
+		protocol {
+			experimental_http3
+		}
+	}
+}
+
+# ─── Application principale ───────────────────────────────────
+# Redirige tout le trafic vers l'application Next.js
+{$DOMAIN} {
+	reverse_proxy app:3000
+
+	# En-têtes de sécurité
+	header {
+		# Protection contre le clickjacking
+		X-Frame-Options SAMEORIGIN
+		# Empêche le sniffing MIME
+		X-Content-Type-Options nosniff
+		# Force HTTPS (HSTS) — 1 an
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		# Politique de référent
+		Referrer-Policy strict-origin-when-cross-origin
+		# Supprimer l'en-tête Server pour ne pas exposer la techno
+		-Server
+	}
+
+	# Compression gzip/zstd automatique
+	encode gzip zstd
+
+	# Logs d'accès
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 10mb
+			roll_keep 5
+		}
+	}
+}
+
+# ─── API Supabase ─────────────────────────────────────────────
+# Accessible sur api.{$DOMAIN} (Kong gateway)
+api.{$DOMAIN} {
+	reverse_proxy kong:8000
+
+	header {
+		X-Content-Type-Options nosniff
+		-Server
+	}
+
+	encode gzip
+}
+
+# ─── Supabase Studio (accès restreint) ───────────────────────
+# Interface d'administration de la base de données
+# Recommandé : restreindre aux IPs de l'équipe en production
+studio.{$DOMAIN} {
+	# Authentification basique pour protéger Studio en production
+	# Remplacer par votre propre mot de passe hashé :
+	# caddy hash-password --plaintext "votre-mot-de-passe"
+	# basic_auth {
+	#   admin $2a$14$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	# }
+
+	reverse_proxy studio:3000
+
+	header {
+		X-Frame-Options DENY
+		X-Content-Type-Options nosniff
+		-Server
+	}
+}
+
+# ─── Redirection www → non-www ───────────────────────────────
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}

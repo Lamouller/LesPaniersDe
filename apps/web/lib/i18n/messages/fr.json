@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "shop": "Boutique",
+    "account": "Mon compte",
+    "deliveries": "Mes retraits",
+    "producer": "Espace producteur",
+    "admin": "Administration",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Accédez à votre espace",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "magic_link": "Connexion par lien magique",
+      "submit": "Se connecter",
+      "no_account": "Pas encore de compte ?",
+      "register_link": "S'inscrire",
+      "forgot": "Mot de passe oublié ?"
+    },
+    "register": {
+      "title": "Inscription",
+      "subtitle": "Rejoignez votre communauté locale",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "entity": "Votre lieu de retrait",
+      "entity_placeholder": "Sélectionnez votre entité",
+      "gdpr": "J'accepte les conditions générales et la politique de confidentialité",
+      "submit": "Créer mon compte",
+      "already_account": "Déjà un compte ?"
+    }
+  },
+  "shop": {
+    "title": "Catalogue de la semaine",
+    "deadline": "Commande jusqu'au jeudi 20h",
+    "basket": "Voir mon panier",
+    "add": "Ajouter",
+    "quantity": "Quantité",
+    "size_s": "Petit panier",
+    "size_m": "Panier moyen",
+    "size_l": "Grand panier",
+    "checkout": {
+      "title": "Récapitulatif de commande",
+      "payment_info": "Vous paierez en direct lors du retrait à votre entité",
+      "confirm": "Confirmer la commande",
+      "entity": "Lieu de retrait"
+    }
+  },
+  "account": {
+    "title": "Mon espace",
+    "next_order": "Prochaine commande",
+    "history": "Historique",
+    "unpaid": "Impayés",
+    "notify_paid": "J'ai payé, prévenir l'admin",
+    "preferences": "Mes préférences",
+    "allergies": "Allergies alimentaires",
+    "notifications": "Notifications"
+  },
+  "delivery": {
+    "title": "Mes retraits",
+    "upcoming": "À venir",
+    "in_progress": "En cours",
+    "completed": "Terminé",
+    "eta": "Arrive dans environ",
+    "minutes": "min",
+    "map_live": "Suivi en direct"
+  },
+  "admin": {
+    "title": "Administration",
+    "sales": "Paiements",
+    "users": "Utilisateurs",
+    "entities": "Entités",
+    "producers": "Producteurs",
+    "mark_paid": "Pointer le paiement",
+    "method": {
+      "cash": "Espèces",
+      "card": "CB",
+      "transfer": "Virement",
+      "check": "Chèque"
+    },
+    "reference": "Référence (optionnel)"
+  },
+  "producer": {
+    "title": "Espace producteur",
+    "catalog": "Catalogue",
+    "route": "Tournée",
+    "messages": "Messages",
+    "optimize": "Optimiser avec OSRM",
+    "start_tour": "Démarrer la tournée",
+    "orders": "Commandes"
+  },
+  "errors": {
+    "not_found": "Page introuvable",
+    "unauthorized": "Accès non autorisé",
+    "generic": "Une erreur est survenue",
+    "retry": "Réessayer"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "yes": "Oui",
+    "no": "Non"
+  }
+}

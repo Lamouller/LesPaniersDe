@@ -1,0 +1,81 @@
+# ─── Node.js ────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ─── Next.js ────────────────────────────────────────────────────────────────
+.next/
+out/
+build/
+dist/
+.vercel/
+.turbo/
+
+# ─── Variables d'environnement (JAMAIS commiter les secrets) ────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.production
+
+# ─── Supabase ───────────────────────────────────────────────────────────────
+supabase/.branches/
+supabase/.temp/
+
+# ─── Docker ─────────────────────────────────────────────────────────────────
+# Volumes persistants Docker (données Postgres, OSRM, Caddy)
+volumes/
+docker-volumes/
+caddy-data/
+caddy-config/
+osrm-data/
+postgres-data/
+
+# ─── IDE / Editeurs ──────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ─── macOS ───────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Icon?
+
+# ─── Tests ───────────────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Typescript ──────────────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Fichiers générés ────────────────────────────────────────────────────────
+.eslintcache
+.cache/
+*.pid
+*.seed
+*.pid.lock

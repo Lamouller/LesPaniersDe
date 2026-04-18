@@ -1,0 +1,67 @@
+version: "3.8"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LesPaniersDe — Override développement local
+# Utilisation : docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# Ou via setup.sh en mode dev
+#
+# Différences avec la prod :
+#   - L'app Next.js tourne en mode dev avec hot-reload (pas de build Docker)
+#   - Ports des services Supabase exposés localement pour l'outillage
+#   - Caddy désactivé (accès direct via ports)
+#   - Pas de healthcheck contraignant sur l'app
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+services:
+
+  # ─── Application Next.js en mode développement ────────────────
+  # Le code source est monté en volume pour le hot-reload
+  # npm run dev tourne directement (pas de build Docker)
+  app:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: deps  # Etape deps uniquement, pas le build complet
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules  # On ne monte pas node_modules de l'hôte
+      - /app/.next          # Cache Next.js dans le container
+    ports:
+      - "3000:3000"
+
+  # ─── PostgreSQL — port exposé pour connexion directe ──────────
+  # Permet d'utiliser des outils comme TablePlus, DBeaver, psql
+  db:
+    ports:
+      - "5432:5432"
+
+  # ─── Kong — ports exposés pour tester l'API directement ───────
+  kong:
+    ports:
+      - "8000:8000"   # API Supabase
+      - "8443:8443"   # HTTPS Kong (dev)
+
+  # ─── Supabase Studio — accès direct sans Caddy ────────────────
+  studio:
+    ports:
+      - "3001:3000"   # Interface Studio sur http://localhost:3001
+
+  # ─── PostgREST — port exposé pour tester l'API REST ──────────
+  rest:
+    ports:
+      - "3000:3000"
+
+  # ─── OSRM — port exposé pour tester le routage ───────────────
+  osrm:
+    ports:
+      - "5000:5000"
+
+  # ─── Caddy désactivé en développement ────────────────────────
+  # En dev, on accède aux services directement par leurs ports
+  caddy:
+    profiles:
+      - production  # Ne démarre qu'avec --profile production

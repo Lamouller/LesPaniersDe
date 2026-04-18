@@ -1,0 +1,115 @@
+{
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "account": "My account",
+    "deliveries": "My pickups",
+    "producer": "Producer space",
+    "admin": "Administration",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Access your space",
+      "email": "Email address",
+      "password": "Password",
+      "magic_link": "Login with magic link",
+      "submit": "Login",
+      "no_account": "No account yet?",
+      "register_link": "Register",
+      "forgot": "Forgot password?"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Join your local community",
+      "email": "Email address",
+      "password": "Password",
+      "entity": "Your pickup location",
+      "entity_placeholder": "Select your entity",
+      "gdpr": "I accept the terms and conditions and privacy policy",
+      "submit": "Create my account",
+      "already_account": "Already have an account?"
+    }
+  },
+  "shop": {
+    "title": "This week's catalog",
+    "deadline": "Order by Thursday 8pm",
+    "basket": "View my basket",
+    "add": "Add",
+    "quantity": "Quantity",
+    "size_s": "Small basket",
+    "size_m": "Medium basket",
+    "size_l": "Large basket",
+    "checkout": {
+      "title": "Order summary",
+      "payment_info": "You will pay in person when picking up at your entity",
+      "confirm": "Confirm order",
+      "entity": "Pickup location"
+    }
+  },
+  "account": {
+    "title": "My space",
+    "next_order": "Next order",
+    "history": "History",
+    "unpaid": "Unpaid",
+    "notify_paid": "I paid, notify admin",
+    "preferences": "My preferences",
+    "allergies": "Food allergies",
+    "notifications": "Notifications"
+  },
+  "delivery": {
+    "title": "My pickups",
+    "upcoming": "Upcoming",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "eta": "Arriving in approximately",
+    "minutes": "min",
+    "map_live": "Live tracking"
+  },
+  "admin": {
+    "title": "Administration",
+    "sales": "Payments",
+    "users": "Users",
+    "entities": "Entities",
+    "producers": "Producers",
+    "mark_paid": "Mark as paid",
+    "method": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Bank transfer",
+      "check": "Cheque"
+    },
+    "reference": "Reference (optional)"
+  },
+  "producer": {
+    "title": "Producer space",
+    "catalog": "Catalog",
+    "route": "Route",
+    "messages": "Messages",
+    "optimize": "Optimize with OSRM",
+    "start_tour": "Start the tour",
+    "orders": "Orders"
+  },
+  "errors": {
+    "not_found": "Page not found",
+    "unauthorized": "Unauthorized",
+    "generic": "An error occurred",
+    "retry": "Retry"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No"
+  }
+}
