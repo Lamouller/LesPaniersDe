@@ -16,7 +16,7 @@ WORKDIR /app
 # Si package.json ne change pas, cette étape est réutilisée du cache
 COPY package.json package-lock.json* ./
 
-RUN npm ci --only=production --ignore-scripts
+RUN npm install --ignore-scripts
 
 # ─── Etape 2 : Build de l'application ─────────────────────────
 FROM node:20-alpine AS builder

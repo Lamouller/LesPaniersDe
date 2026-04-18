@@ -1,0 +1,313 @@
+version: "3.8"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LesPaniersDe — Stack locale autonome (développement)
+#
+# Usage :
+#   Démarrer   : docker compose -f docker-compose.local.yml up -d
+#   Arrêter    : docker compose -f docker-compose.local.yml down
+#   Logs       : docker compose -f docker-compose.local.yml logs -f <service>
+#   Rebuild app: docker compose -f docker-compose.local.yml up -d --build app
+#
+# Ports utilisés (libres sur le host) :
+#   3200  — App Next.js
+#   5441  — PostgreSQL
+#   8200  — Kong API Gateway
+#   8250  — Inbucket UI (mails dev)
+#   2520  — Inbucket SMTP
+#   54350 — Supabase Studio
+#
+# Prefixe containers : lespaniersde-
+# Prefixe volumes    : lespaniersde_
+# Network            : lespaniersde_internal
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+services:
+
+  # ─── PostgreSQL 15 (image Supabase avec postgis/pgcrypto) ─────
+  db:
+    container_name: lespaniersde-db
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lespaniersde_dev_2026}
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - lespaniersde_db_data:/var/lib/postgresql/data
+      # Stratégie : NE PAS monter dans /docker-entrypoint-initdb.d directement
+      # (cela écraserait les scripts internes de l'image Supabase qui créent les rôles).
+      #
+      # init-schema.sql → /etc/postgresql.schema.sql
+      # Le migrate.sh Supabase l'exécute en dernier (post-init hook), APRÈS les
+      # init-scripts internes qui créent les rôles Supabase.
+      # Il contient : ALTER USER ... WITH PASSWORD (pour scram-sha-256) + les 4 migrations.
+      - ./supabase/init-schema.sql:/etc/postgresql.schema.sql:ro
+    ports:
+      - "5441:5432"
+    networks:
+      - lespaniersde_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ─── Supabase Auth (GoTrue) ───────────────────────────────────
+  auth:
+    container_name: lespaniersde-auth
+    image: supabase/gotrue:v2.143.0
+    restart: unless-stopped
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgresql://supabase_auth_admin:${POSTGRES_PASSWORD:-lespaniersde_dev_2026}@db:5432/postgres
+      GOTRUE_SITE_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3200}
+      GOTRUE_URI_ALLOW_LIST: ${NEXT_PUBLIC_APP_URL:-http://localhost:3200}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_SMTP_HOST: ${SMTP_HOST:-inbucket}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-2500}
+      GOTRUE_SMTP_USER: ${SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${SMTP_PASSWORD:-}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_FROM:-noreply@lespaniersde.local}
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      API_EXTERNAL_URL: http://localhost:8200
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lespaniersde_internal
+
+  # ─── PostgREST (API REST auto-générée) ───────────────────────
+  rest:
+    container_name: lespaniersde-rest
+    image: postgrest/postgrest:v12.0.2
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgresql://authenticator:${POSTGRES_PASSWORD:-lespaniersde_dev_2026}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,storage,graphql_public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_APP_SETTINGS_JWT_EXP: 3600
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lespaniersde_internal
+
+  # ─── Supabase Realtime (WebSockets) ───────────────────────────
+  realtime:
+    container_name: lespaniersde-realtime
+    image: supabase/realtime:v2.28.32
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: supabase_admin
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-lespaniersde_dev_2026}
+      DB_NAME: postgres
+      DB_AFTER_CONNECT_QUERY: SET search_path TO _realtime
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: "false"
+      DNS_NODES: "''"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lespaniersde_internal
+
+  # ─── Supabase Storage ─────────────────────────────────────────
+  storage:
+    container_name: lespaniersde-storage
+    image: supabase/storage-api:v0.46.4
+    restart: unless-stopped
+    environment:
+      ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlLWRlbW8iLCJpYXQiOjE2NDE3NjkyMDAsImV4cCI6MTc5OTUzNTYwMH0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+      SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UtZGVtbyIsImlhdCI6MTY0MTc2OTIwMCwiZXhwIjoxNzk5NTM1NjAwfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      DATABASE_URL: postgresql://supabase_storage_admin:${POSTGRES_PASSWORD:-lespaniersde_dev_2026}@db:5432/postgres
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: local
+      GLOBAL_S3_BUCKET: stub
+    volumes:
+      - lespaniersde_storage_data:/var/lib/storage
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    networks:
+      - lespaniersde_internal
+
+  # ─── Supabase Meta (administration PostgreSQL) ────────────────
+  meta:
+    container_name: lespaniersde-meta
+    image: supabase/postgres-meta:v0.80.0
+    restart: unless-stopped
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: supabase_admin
+      PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD:-lespaniersde_dev_2026}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lespaniersde_internal
+
+  # ─── imgproxy (redimensionnement images) ──────────────────────
+  imgproxy:
+    container_name: lespaniersde-imgproxy
+    image: darthsim/imgproxy:v3.8.0
+    restart: unless-stopped
+    environment:
+      IMGPROXY_BIND: ":5001"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
+      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+    volumes:
+      - lespaniersde_storage_data:/var/lib/storage:ro
+    networks:
+      - lespaniersde_internal
+
+  # ─── Kong (API Gateway — point d'entrée Supabase) ─────────────
+  kong:
+    container_name: lespaniersde-kong
+    image: kong:2.8.1
+    restart: unless-stopped
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./supabase/kong.yml:/home/kong/kong.yml:ro
+    depends_on:
+      auth:
+        condition: service_started
+      rest:
+        condition: service_started
+    ports:
+      - "8200:8000"
+    networks:
+      - lespaniersde_internal
+
+  # ─── Supabase Studio (interface d'administration BDD) ─────────
+  studio:
+    container_name: lespaniersde-studio
+    image: supabase/studio:latest
+    restart: unless-stopped
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lespaniersde_dev_2026}
+      DEFAULT_ORGANIZATION_NAME: LesPaniersDe
+      DEFAULT_PROJECT_NAME: lespaniersde-local
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_PUBLIC_URL: http://localhost:8200
+      SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlLWRlbW8iLCJpYXQiOjE2NDE3NjkyMDAsImV4cCI6MTc5OTUzNTYwMH0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UtZGVtbyIsImlhdCI6MTY0MTc2OTIwMCwiZXhwIjoxNzk5NTM1NjAwfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q}
+      NEXT_PUBLIC_ENABLE_LOGS: "false"
+      NEXT_ANALYTICS_BACKEND_PROVIDER: postgres
+    depends_on:
+      meta:
+        condition: service_started
+    ports:
+      - "54350:3000"
+    networks:
+      - lespaniersde_internal
+
+  # ─── Inbucket (serveur mail dev — capture les emails sortants) ─
+  inbucket:
+    container_name: lespaniersde-inbucket
+    image: inbucket/inbucket:3.0.3
+    restart: unless-stopped
+    ports:
+      - "2520:2500"   # SMTP
+      - "8250:9000"   # Web UI
+    networks:
+      - lespaniersde_internal
+
+  # ─── Application Next.js ──────────────────────────────────────
+  # Build depuis le Dockerfile multi-stage (deps → builder → runner)
+  # VITE_* / NEXT_PUBLIC_* sont baked au build : si changé → rebuild
+  app:
+    container_name: lespaniersde-app
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3200}
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:8200}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlLWRlbW8iLCJpYXQiOjE2NDE3NjkyMDAsImV4cCI6MTc5OTUzNTYwMH0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3200}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:8200}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlLWRlbW8iLCJpYXQiOjE2NDE3NjkyMDAsImV4cCI6MTc5OTUzNTYwMH0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UtZGVtbyIsImlhdCI6MTY0MTc2OTIwMCwiZXhwIjoxNzk5NTM1NjAwfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q}
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-lespaniersde_dev_2026}@db:5432/postgres
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-token-with-at-least-32-characters-long}
+      SMTP_HOST: ${SMTP_HOST:-inbucket}
+      SMTP_PORT: ${SMTP_PORT:-2500}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@lespaniersde.local}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-LesPaniersDe}
+      WHATSAPP_PHONE_ID: ${WHATSAPP_PHONE_ID:-}
+      WHATSAPP_ACCESS_TOKEN: ${WHATSAPP_ACCESS_TOKEN:-}
+      WHATSAPP_BUSINESS_ACCOUNT_ID: ${WHATSAPP_BUSINESS_ACCOUNT_ID:-}
+      WHATSAPP_APP_SECRET: ${WHATSAPP_APP_SECRET:-}
+      WHATSAPP_WEBHOOK_VERIFY_TOKEN: ${WHATSAPP_WEBHOOK_VERIFY_TOKEN:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_EMAIL: ${VAPID_EMAIL:-}
+      OSRM_URL: ${OSRM_URL:-}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      PAYMENT_REMINDER_DAYS: ${PAYMENT_REMINDER_DAYS:-3}
+      PAYMENT_BLOCK_DAYS: ${PAYMENT_BLOCK_DAYS:-7}
+    ports:
+      - "3200:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      kong:
+        condition: service_started
+    networks:
+      - lespaniersde_internal
+
+# ─── Réseau dédié (isolé des autres projets) ──────────────────
+networks:
+  lespaniersde_internal:
+    name: lespaniersde_internal
+    driver: bridge
+
+# ─── Volumes préfixés pour isolation ─────────────────────────
+volumes:
+  lespaniersde_db_data:
+    name: lespaniersde_db_data
+    driver: local
+  lespaniersde_storage_data:
+    name: lespaniersde_storage_data
+    driver: local
