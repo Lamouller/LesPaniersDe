@@ -1,12 +1,27 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { Package, ShoppingBasket, Apple, Egg, MoreHorizontal, Plus, Check, Loader2, Trash2, Eye, EyeOff, Info } from 'lucide-react';
+import {
+  Package,
+  ShoppingBasket,
+  Apple,
+  Egg,
+  MoreHorizontal,
+  Plus,
+  Check,
+  Loader2,
+  Trash2,
+  Eye,
+  EyeOff,
+  Info,
+  Pencil,
+  Upload,
+  ImageOff,
+} from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -17,14 +32,15 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { euroToCents, centsToEuro } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 import type { Product } from './page';
 
-// ─── Zod schemas ────────────────────────────────────────────────────────────
+// ─── Zod schemas ─────────────────────────────────────────────────────────────
 
 const kindValues = ['basket', 'fruit_option', 'egg_option', 'other'] as const;
 const sizeValues = ['S', 'M', 'L', 'XL'] as const;
 
-const createProductSchema = z.object({
+const productFormSchema = z.object({
   name: z.string().min(1, 'Nom requis'),
   kind: z.enum(kindValues),
   size: z.enum(sizeValues).nullable().optional(),
@@ -38,9 +54,9 @@ const createProductSchema = z.object({
   is_active: z.boolean(),
 });
 
-type CreateProductForm = z.infer<typeof createProductSchema>;
+type ProductForm = z.infer<typeof productFormSchema>;
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const KIND_LABELS: Record<Product['kind'], string> = {
   basket: 'Paniers',
@@ -49,259 +65,585 @@ const KIND_LABELS: Record<Product['kind'], string> = {
   other: 'Autres',
 };
 
+const KIND_BADGE: Record<Product['kind'], string> = {
+  basket: 'Panier',
+  fruit_option: 'Fruits',
+  egg_option: 'Œufs',
+  other: 'Autre',
+};
+
 const KIND_ORDER: Product['kind'][] = ['basket', 'fruit_option', 'egg_option', 'other'];
 
-function KindIcon({ kind }: { kind: Product['kind'] }) {
-  const cls = 'w-4 h-4';
+const KIND_BG: Record<Product['kind'], string> = {
+  basket: 'from-primary/30 to-primary/10',
+  fruit_option: 'from-amber-500/30 to-amber-500/10',
+  egg_option: 'from-yellow-400/30 to-yellow-400/10',
+  other: 'from-neutral-500/30 to-neutral-500/10',
+};
+
+const KIND_ICON_COLOR: Record<Product['kind'], string> = {
+  basket: 'text-primary/60',
+  fruit_option: 'text-amber-500/60',
+  egg_option: 'text-yellow-400/60',
+  other: 'text-neutral-400/60',
+};
+
+const KIND_BADGE_COLOR: Record<Product['kind'], string> = {
+  basket: 'bg-primary/20 text-primary border-primary/30',
+  fruit_option: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  egg_option: 'bg-yellow-400/20 text-yellow-300 border-yellow-400/30',
+  other: 'bg-neutral-500/20 text-neutral-400 border-neutral-500/30',
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function KindIcon({ kind, className }: { kind: Product['kind']; className?: string }) {
+  const cls = className ?? 'w-4 h-4';
   if (kind === 'basket') return <ShoppingBasket className={cls} />;
   if (kind === 'fruit_option') return <Apple className={cls} />;
   if (kind === 'egg_option') return <Egg className={cls} />;
   return <MoreHorizontal className={cls} />;
 }
 
-// ─── Row state type ──────────────────────────────────────────────────────────
-
-interface RowState {
-  name: string;
-  kind: Product['kind'];
-  size: Product['size'];
-  price_euro: string;
-  is_active: boolean;
-  dirty: boolean;
-  saving: boolean;
-  saved: boolean;
-  error: string | null;
+function KindBadge({ kind }: { kind: Product['kind'] }) {
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${KIND_BADGE_COLOR[kind]}`}>
+      <KindIcon kind={kind} className="w-3 h-3" />
+      {KIND_BADGE[kind]}
+    </span>
+  );
 }
 
-// ─── ProductRow ──────────────────────────────────────────────────────────────
+// ─── Photo upload helper ──────────────────────────────────────────────────────
 
-interface ProductRowProps {
+async function uploadProductPhoto(
+  file: File,
+  producerId: string,
+  productId: string,
+): Promise<string | null> {
+  const supabase = createClient();
+  const ext = file.name.split('.').pop() ?? 'jpg';
+  const path = `${producerId}/${productId}-${Date.now()}.${ext}`;
+
+  const { error } = await supabase.storage.from('products').upload(path, file, {
+    upsert: true,
+    contentType: file.type,
+  });
+
+  if (error) {
+    console.error('[uploadProductPhoto]', error);
+    return null;
+  }
+
+  const { data } = supabase.storage.from('products').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ─── ProductCard ──────────────────────────────────────────────────────────────
+
+interface ProductCardProps {
   product: Product;
   readOnly: boolean;
   onSoftDelete: (id: string) => void;
+  onUpdated: (product: Product) => void;
+  onEdit: () => void;
 }
 
-function ProductRow({ product, readOnly, onSoftDelete }: ProductRowProps) {
-  const [state, setState] = useState<RowState>({
-    name: product.name,
-    kind: product.kind,
-    size: product.size,
-    price_euro: centsToEuro(product.unit_price_cents),
-    is_active: product.is_active,
-    dirty: false,
-    saving: false,
-    saved: false,
-    error: null,
-  });
-
+function ProductCard({ product, readOnly, onSoftDelete, onUpdated, onEdit }: ProductCardProps) {
+  const [isActive, setIsActive] = useState(product.is_active);
+  const [toggling, setToggling] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [priceStr, setPriceStr] = useState(centsToEuro(product.unit_price_cents));
+  const [priceDirty, setPriceDirty] = useState(false);
+  const [priceSaving, setPriceSaving] = useState(false);
+  const [priceSaved, setPriceSaved] = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
 
-  function update<K extends keyof RowState>(field: K, value: RowState[K]) {
-    setState((prev) => ({ ...prev, [field]: value, dirty: true, saved: false, error: null }));
-  }
-
-  async function handleSave() {
-    if (readOnly || !state.dirty) return;
-
-    // Client-side validation
-    if (!state.name.trim()) {
-      setState((prev) => ({ ...prev, error: 'Nom requis' }));
-      return;
-    }
-    const cents = euroToCents(state.price_euro);
-    if (isNaN(cents) || cents < 0) {
-      setState((prev) => ({ ...prev, error: 'Prix invalide' }));
-      return;
-    }
-
-    setState((prev) => ({ ...prev, saving: true, error: null }));
+  async function handleToggle() {
+    if (readOnly || toggling) return;
+    setToggling(true);
+    const newActive = !isActive;
     try {
       const res = await fetch(`/api/producers/products/${product.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: state.name.trim(),
-          kind: state.kind,
-          size: state.kind === 'basket' ? state.size : null,
-          unit_price_cents: cents,
-          is_active: state.is_active,
-        }),
+        body: JSON.stringify({ is_active: newActive }),
+      });
+      if (res.ok) {
+        setIsActive(newActive);
+        const d = (await res.json()) as { product: Product };
+        onUpdated(d.product);
+      }
+    } finally {
+      setToggling(false);
+    }
+  }
+
+  async function handlePriceSave() {
+    if (readOnly || !priceDirty) return;
+    const cents = euroToCents(priceStr);
+    if (isNaN(cents) || cents < 0) {
+      setPriceError('Prix invalide');
+      return;
+    }
+    setPriceSaving(true);
+    setPriceError(null);
+    try {
+      const res = await fetch(`/api/producers/products/${product.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unit_price_cents: cents }),
       });
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setState((prev) => ({ ...prev, saving: false, error: data.error ?? 'Erreur serveur' }));
-        return;
+        const d = (await res.json()) as { error?: string };
+        setPriceError(d.error ?? 'Erreur');
+      } else {
+        const d = (await res.json()) as { product: Product };
+        onUpdated(d.product);
+        setPriceDirty(false);
+        setPriceSaved(true);
+        setTimeout(() => setPriceSaved(false), 2000);
       }
-      setState((prev) => ({ ...prev, saving: false, dirty: false, saved: true, error: null }));
-      setTimeout(() => setState((prev) => ({ ...prev, saved: false })), 2000);
     } catch {
-      setState((prev) => ({ ...prev, saving: false, error: 'Erreur réseau' }));
+      setPriceError('Erreur réseau');
+    } finally {
+      setPriceSaving(false);
     }
   }
 
   async function handleDelete() {
-    if (readOnly) return;
-    setState((prev) => ({ ...prev, saving: true }));
+    if (readOnly || deleting) return;
+    setDeleting(true);
     try {
       const res = await fetch(`/api/producers/products/${product.id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
-        setState((prev) => ({ ...prev, saving: false, error: data.error ?? 'Erreur serveur' }));
-        return;
+      if (res.ok) {
+        onSoftDelete(product.id);
+      } else {
+        setDeleting(false);
+        setConfirmDelete(false);
       }
-      onSoftDelete(product.id);
     } catch {
-      setState((prev) => ({ ...prev, saving: false, error: 'Erreur réseau' }));
+      setDeleting(false);
+      setConfirmDelete(false);
     }
   }
 
-  const inputCls = `w-full px-2.5 py-1.5 bg-white/5 border border-white/10 rounded-lg text-sm text-neutral-100
-    focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors
-    disabled:opacity-50 disabled:cursor-not-allowed`;
+  const priceCls =
+    'w-full pl-3 pr-8 py-2 text-2xl font-bold text-primary bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
-    <tr className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
-      {/* Nom */}
-      <td className="py-2.5 px-3">
-        <input
-          type="text"
-          value={state.name}
-          onChange={(e) => update('name', e.target.value)}
-          disabled={readOnly}
-          className={inputCls}
-          placeholder="Nom du produit"
-        />
-      </td>
-
-      {/* Type */}
-      <td className="py-2.5 px-3">
-        <select
-          value={state.kind}
-          onChange={(e) => update('kind', e.target.value as Product['kind'])}
-          disabled={readOnly}
-          className={inputCls}
-        >
-          <option value="basket">Panier</option>
-          <option value="fruit_option">Option fruits</option>
-          <option value="egg_option">Option œufs</option>
-          <option value="other">Autre</option>
-        </select>
-      </td>
-
-      {/* Taille */}
-      <td className="py-2.5 px-3">
-        {state.kind === 'basket' ? (
-          <select
-            value={state.size ?? ''}
-            onChange={(e) => update('size', (e.target.value || null) as Product['size'])}
-            disabled={readOnly}
-            className={inputCls}
-          >
-            <option value="">—</option>
-            <option value="S">S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-            <option value="XL">XL</option>
-          </select>
+    <div className="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:border-white/20 hover:bg-white/[0.07] transition-all duration-300">
+      {/* Photo zone */}
+      <div className="relative aspect-[4/3] overflow-hidden">
+        {product.photo_url ? (
+          <img
+            src={product.photo_url}
+            alt={product.name}
+            loading="lazy"
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <span className="text-neutral-600 text-sm px-2">—</span>
+          <div className={`w-full h-full bg-gradient-to-br ${KIND_BG[product.kind]} flex items-center justify-center`}>
+            <KindIcon kind={product.kind} className={`w-16 h-16 ${KIND_ICON_COLOR[product.kind]}`} />
+          </div>
         )}
-      </td>
 
-      {/* Prix */}
-      <td className="py-2.5 px-3">
-        <div className="relative">
-          <input
-            type="text"
-            value={state.price_euro}
-            onChange={(e) => update('price_euro', e.target.value)}
-            disabled={readOnly}
-            className={`${inputCls} pr-6`}
-            placeholder="0,00"
-            inputMode="decimal"
-          />
-          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-neutral-500">€</span>
+        {/* Gradient bas */}
+        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-neutral-950/60 to-transparent pointer-events-none" />
+
+        {/* Kind badge — haut gauche */}
+        <div className="absolute top-2 left-2">
+          <KindBadge kind={product.kind} />
         </div>
-      </td>
 
-      {/* Actif */}
-      <td className="py-2.5 px-3 text-center">
-        <button
-          type="button"
-          onClick={() => !readOnly && update('is_active', !state.is_active)}
-          disabled={readOnly}
-          className={`w-9 h-5 rounded-full transition-colors duration-200 relative flex-shrink-0
-            ${state.is_active ? 'bg-primary' : 'bg-white/10'}
-            disabled:opacity-50 disabled:cursor-not-allowed`}
-          aria-label={state.is_active ? 'Désactiver' : 'Activer'}
-        >
-          <span
-            className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
-              ${state.is_active ? 'translate-x-4' : 'translate-x-0.5'}`}
-          />
-        </button>
-      </td>
+        {/* Toggle actif — haut droite */}
+        <div className="absolute top-2 right-2">
+          <button
+            type="button"
+            onClick={() => { void handleToggle(); }}
+            disabled={readOnly || toggling}
+            aria-label={isActive ? 'Désactiver' : 'Activer'}
+            className={`w-10 h-5 rounded-full transition-colors duration-200 relative flex-shrink-0 shadow-md
+              ${isActive ? 'bg-primary' : 'bg-neutral-700'}
+              disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            <span
+              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200
+                ${isActive ? 'translate-x-5' : 'translate-x-0.5'}`}
+            />
+          </button>
+        </div>
+      </div>
 
-      {/* Actions */}
-      <td className="py-2.5 px-3">
-        <div className="flex items-center gap-1.5 justify-end">
-          {state.error && (
-            <span className="text-xs text-red-400 max-w-[120px] truncate" title={state.error}>
-              {state.error}
+      {/* Corps */}
+      <div className="p-4 space-y-3">
+        {/* Nom + taille */}
+        <div>
+          <h3 className="font-semibold text-lg text-neutral-50 leading-tight">{product.name}</h3>
+          {product.size && product.kind === 'basket' && (
+            <span className="inline-block mt-0.5 text-xs font-medium text-neutral-400 bg-white/5 border border-white/10 rounded px-1.5 py-0.5">
+              Taille {product.size}
             </span>
           )}
-          {state.saved && (
-            <span className="text-xs text-green-400 flex items-center gap-1">
-              <Check className="w-3 h-3" /> enregistré
-            </span>
-          )}
-          {!readOnly && state.dirty && !state.saving && (
-            <button
-              type="button"
-              onClick={() => { void handleSave(); }}
-              className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors"
-              title="Enregistrer"
-            >
-              💾
-            </button>
-          )}
-          {state.saving && <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />}
-          {!readOnly && !confirmDelete && (
-            <button
-              type="button"
-              onClick={() => setConfirmDelete(true)}
-              className="p-1.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-              title="Supprimer (désactiver)"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          )}
-          {!readOnly && confirmDelete && (
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-red-400">Confirmer ?</span>
-              <button
-                type="button"
-                onClick={() => { void handleDelete(); }}
-                className="px-2 py-0.5 text-xs rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
-              >
-                Oui
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="px-2 py-0.5 text-xs rounded bg-white/5 text-neutral-400 hover:bg-white/10 transition-colors"
-              >
-                Non
-              </button>
+        </div>
+
+        {/* Description */}
+        {product.description && (
+          <p className="text-sm text-neutral-400 leading-relaxed line-clamp-3">
+            {product.description}
+          </p>
+        )}
+
+        {/* Prix éditable inline */}
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <div className="relative">
+              <input
+                type="text"
+                value={priceStr}
+                onChange={(e) => {
+                  setPriceStr(e.target.value);
+                  setPriceDirty(true);
+                  setPriceSaved(false);
+                  setPriceError(null);
+                }}
+                onBlur={() => { if (priceDirty) void handlePriceSave(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter') void handlePriceSave(); }}
+                disabled={readOnly}
+                inputMode="decimal"
+                className={priceCls}
+                placeholder="0,00"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-base text-primary/60 font-bold pointer-events-none">€</span>
             </div>
-          )}
+            {priceError && <p className="text-xs text-red-400 mt-1">{priceError}</p>}
+          </div>
+          {priceSaving && <Loader2 className="w-4 h-4 animate-spin text-neutral-400 flex-shrink-0 mb-2" />}
+          {priceSaved && <Check className="w-4 h-4 text-green-400 flex-shrink-0 mb-2" />}
         </div>
-      </td>
-    </tr>
+
+        {/* Actions */}
+        {!readOnly && (
+          <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Éditer
+            </button>
+            {!confirmDelete ? (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="p-1.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
+                title="Supprimer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            ) : (
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-red-400">Supprimer ?</span>
+                <button
+                  type="button"
+                  onClick={() => { void handleDelete(); }}
+                  disabled={deleting}
+                  className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/20 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Oui'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-neutral-400 hover:bg-white/10 transition-colors"
+                >
+                  Non
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
-// ─── CreateProductModal ──────────────────────────────────────────────────────
+// ─── ProductEditModal ─────────────────────────────────────────────────────────
+
+interface ProductEditModalProps {
+  open: boolean;
+  onClose: () => void;
+  product: Product;
+  onUpdated: (product: Product) => void;
+}
+
+function ProductEditModal({ open, onClose, product, onUpdated }: ProductEditModalProps) {
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(product.photo_url);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductForm>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: product.name,
+      kind: product.kind,
+      size: product.size,
+      description: product.description ?? '',
+      price_euro: centsToEuro(product.unit_price_cents),
+      photo_url: product.photo_url ?? '',
+      is_active: product.is_active,
+    },
+  });
+
+  const watchKind = watch('kind');
+
+  function handleClose() {
+    reset({
+      name: product.name,
+      kind: product.kind,
+      size: product.size,
+      description: product.description ?? '',
+      price_euro: centsToEuro(product.unit_price_cents),
+      photo_url: product.photo_url ?? '',
+      is_active: product.is_active,
+    });
+    setServerError(null);
+    setPreviewUrl(product.photo_url);
+    onClose();
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
+
+    setUploadingPhoto(true);
+    try {
+      const url = await uploadProductPhoto(file, product.producer_id, product.id);
+      if (url) {
+        setValue('photo_url', url);
+        setPreviewUrl(url);
+      } else {
+        setServerError('Erreur upload photo — vérifiez la connexion');
+        setPreviewUrl(product.photo_url);
+      }
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  async function onSubmit(values: ProductForm) {
+    setServerError(null);
+    const unit_price_cents = euroToCents(values.price_euro);
+
+    const res = await fetch(`/api/producers/products/${product.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: values.name.trim(),
+        kind: values.kind,
+        size: values.kind === 'basket' ? (values.size ?? null) : null,
+        description: values.description?.trim() || null,
+        photo_url: values.photo_url?.trim() || null,
+        unit_price_cents,
+        is_active: values.is_active,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = (await res.json()) as { error?: string };
+      setServerError(data.error ?? 'Erreur serveur');
+      return;
+    }
+
+    const data = (await res.json()) as { product: Product };
+    onUpdated(data.product);
+    onClose();
+  }
+
+  const inputCls = `w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-neutral-100
+    focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-colors`;
+  const errorCls = 'text-xs text-red-400 mt-1';
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Modifier le produit</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="space-y-4">
+          {/* Photo upload */}
+          <div className="space-y-2">
+            <Label>Photo</Label>
+            <div className="flex items-start gap-4">
+              <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 bg-white/5 flex items-center justify-center">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                ) : (
+                  <ImageOff className="w-8 h-8 text-neutral-600" />
+                )}
+              </div>
+              <div className="flex-1 space-y-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => { void handleFileChange(e); }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  {uploadingPhoto ? 'Upload en cours…' : 'Choisir une photo'}
+                </button>
+                <p className="text-xs text-neutral-500">JPEG, PNG ou WebP · Max 5 Mo</p>
+                <input
+                  type="text"
+                  className={`${inputCls} text-xs`}
+                  placeholder="Ou coller une URL d'image"
+                  {...register('photo_url')}
+                  onChange={(e) => {
+                    setValue('photo_url', e.target.value);
+                    if (e.target.value) setPreviewUrl(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Nom */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`edit-name-${product.id}`}>Nom *</Label>
+            <input
+              id={`edit-name-${product.id}`}
+              type="text"
+              className={inputCls}
+              placeholder="Ex: Panier XL premium"
+              {...register('name')}
+            />
+            {errors.name && <p className={errorCls}>{errors.name.message}</p>}
+          </div>
+
+          {/* Type + Taille */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor={`edit-kind-${product.id}`}>Type *</Label>
+              <select id={`edit-kind-${product.id}`} className={inputCls} {...register('kind')}>
+                <option value="basket">Panier</option>
+                <option value="fruit_option">Option fruits</option>
+                <option value="egg_option">Option œufs</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+            {watchKind === 'basket' && (
+              <div className="space-y-1.5">
+                <Label htmlFor={`edit-size-${product.id}`}>Taille</Label>
+                <select id={`edit-size-${product.id}`} className={inputCls} {...register('size')}>
+                  <option value="">—</option>
+                  <option value="S">S</option>
+                  <option value="M">M</option>
+                  <option value="L">L</option>
+                  <option value="XL">XL</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Prix */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`edit-price-${product.id}`}>Prix € *</Label>
+            <div className="relative">
+              <input
+                id={`edit-price-${product.id}`}
+                type="text"
+                className={`${inputCls} pr-8`}
+                placeholder="Ex: 22,50"
+                inputMode="decimal"
+                {...register('price_euro')}
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500 pointer-events-none">€</span>
+            </div>
+            {errors.price_euro && <p className={errorCls}>{errors.price_euro.message}</p>}
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <Label htmlFor={`edit-desc-${product.id}`}>Description</Label>
+            <textarea
+              id={`edit-desc-${product.id}`}
+              rows={3}
+              className={`${inputCls} resize-none`}
+              placeholder="Description optionnelle"
+              {...register('description')}
+            />
+          </div>
+
+          {/* Actif */}
+          <div className="flex items-center gap-3">
+            <input
+              id={`edit-active-${product.id}`}
+              type="checkbox"
+              className="w-4 h-4 rounded accent-primary"
+              {...register('is_active')}
+            />
+            <Label htmlFor={`edit-active-${product.id}`}>Produit actif</Label>
+          </div>
+
+          {serverError && (
+            <p className="text-sm text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{serverError}</p>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleClose}
+              disabled={isSubmitting || uploadingPhoto}
+            >
+              Annuler
+            </Button>
+            <Button type="submit" disabled={isSubmitting || uploadingPhoto}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Enregistrement…
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  Enregistrer
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── CreateProductModal ───────────────────────────────────────────────────────
 
 interface CreateProductModalProps {
   open: boolean;
@@ -312,15 +654,19 @@ interface CreateProductModalProps {
 
 function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProductModalProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<CreateProductForm>({
-    resolver: zodResolver(createProductSchema),
+  } = useForm<ProductForm>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       name: '',
       kind: 'basket',
@@ -337,10 +683,43 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
   function handleClose() {
     reset();
     setServerError(null);
+    setPreviewUrl(null);
     onClose();
   }
 
-  async function onSubmit(values: CreateProductForm) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
+    setUploadingPhoto(true);
+
+    try {
+      const supabase = createClient();
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const tempId = `new-${Date.now()}`;
+      const path = `${producerId}/${tempId}.${ext}`;
+
+      const { error } = await supabase.storage.from('products').upload(path, file, {
+        upsert: true,
+        contentType: file.type,
+      });
+
+      if (!error) {
+        const { data } = supabase.storage.from('products').getPublicUrl(path);
+        setValue('photo_url', data.publicUrl);
+        setPreviewUrl(data.publicUrl);
+      } else {
+        setServerError('Erreur upload photo');
+        setPreviewUrl(null);
+      }
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  async function onSubmit(values: ProductForm) {
     setServerError(null);
     const unit_price_cents = euroToCents(values.price_euro);
 
@@ -376,12 +755,59 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nouveau produit</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={(e) => { void handleSubmit(onSubmit)(e); }} className="space-y-4">
+          {/* Photo */}
+          <div className="space-y-2">
+            <Label>Photo</Label>
+            <div className="flex items-start gap-4">
+              <div className="w-24 h-24 rounded-xl overflow-hidden border border-white/10 flex-shrink-0 bg-white/5 flex items-center justify-center">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                ) : (
+                  <ImageOff className="w-8 h-8 text-neutral-600" />
+                )}
+              </div>
+              <div className="flex-1 space-y-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => { void handleFileChange(e); }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingPhoto}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-neutral-300 bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors disabled:opacity-50"
+                >
+                  {uploadingPhoto ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Upload className="w-4 h-4" />
+                  )}
+                  {uploadingPhoto ? 'Upload…' : 'Choisir une photo'}
+                </button>
+                <p className="text-xs text-neutral-500">JPEG, PNG ou WebP · Max 5 Mo</p>
+                <input
+                  type="text"
+                  className={`${inputCls} text-xs`}
+                  placeholder="Ou coller une URL d'image"
+                  {...register('photo_url')}
+                  onChange={(e) => {
+                    setValue('photo_url', e.target.value);
+                    if (e.target.value) setPreviewUrl(e.target.value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Nom */}
           <div className="space-y-1.5">
             <Label htmlFor="create-name">Nom *</Label>
@@ -432,7 +858,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
                 inputMode="decimal"
                 {...register('price_euro')}
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500">€</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500 pointer-events-none">€</span>
             </div>
             {errors.price_euro && <p className={errorCls}>{errors.price_euro.message}</p>}
           </div>
@@ -446,18 +872,6 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
               className={`${inputCls} resize-none`}
               placeholder="Description optionnelle"
               {...register('description')}
-            />
-          </div>
-
-          {/* Photo URL */}
-          <div className="space-y-1.5">
-            <Label htmlFor="create-photo">URL photo</Label>
-            <input
-              id="create-photo"
-              type="text"
-              className={inputCls}
-              placeholder="https://..."
-              {...register('photo_url')}
             />
           </div>
 
@@ -477,10 +891,15 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
           )}
 
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={handleClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleClose}
+              disabled={isSubmitting || uploadingPhoto}
+            >
               Annuler
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || uploadingPhoto}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -500,7 +919,7 @@ function CreateProductModal({ open, onClose, producerId, onCreated }: CreateProd
   );
 }
 
-// ─── ProductsTableClient ─────────────────────────────────────────────────────
+// ─── ProductsTableClient (main export) ───────────────────────────────────────
 
 interface ProductsTableClientProps {
   initialProducts: Product[];
@@ -508,10 +927,15 @@ interface ProductsTableClientProps {
   producerId: string;
 }
 
-export function ProductsTableClient({ initialProducts, readOnly, producerId }: ProductsTableClientProps) {
+export function ProductsTableClient({
+  initialProducts,
+  readOnly,
+  producerId,
+}: ProductsTableClientProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [showInactive, setShowInactive] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const handleSoftDelete = useCallback((id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
@@ -519,6 +943,10 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
 
   const handleCreated = useCallback((product: Product) => {
     setProducts((prev) => [...prev, product]);
+  }, []);
+
+  const handleUpdated = useCallback((updated: Product) => {
+    setProducts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
   }, []);
 
   const displayed = showInactive ? products : products.filter((p) => p.is_active);
@@ -529,14 +957,18 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <Package className="w-5 h-5 text-neutral-400" />
+          <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+            <Package className="w-5 h-5 text-primary" />
+          </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-neutral-50">Mes produits</h1>
-            <p className="text-sm text-neutral-500">Catalogue permanent — tout ce que tu proposes à l&apos;année. L&apos;ouverture des commandes se fait par semaine.</p>
+            <p className="text-sm text-neutral-500">
+              Catalogue permanent — photos, prix et descriptions
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -563,8 +995,8 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
       </div>
 
       {/* Hint catalogue hebdo */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Info className="w-4 h-4 flex-shrink-0 text-neutral-500" />
+      <div className="flex items-center gap-2 text-sm text-neutral-500">
+        <Info className="w-4 h-4 flex-shrink-0" />
         <span>
           Pour ouvrir des commandes, rendez-vous dans{' '}
           <Link href="/producer/catalog" className="text-primary hover:underline font-medium">
@@ -573,59 +1005,71 @@ export function ProductsTableClient({ initialProducts, readOnly, producerId }: P
         </span>
       </div>
 
-      {/* Sections par kind */}
+      {/* Grille par section */}
       {grouped.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-neutral-500">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl py-16 text-center">
+          <Package className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+          <p className="text-neutral-500">
             Aucun produit{!showInactive ? ' actif' : ''} pour le moment.
-          </CardContent>
-        </Card>
+          </p>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={() => setCreateOpen(true)}
+              className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm text-primary border border-primary/30 hover:bg-primary/10 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Ajouter votre premier produit
+            </button>
+          )}
+        </div>
       ) : (
         grouped.map(({ kind, items }) => (
-          <Card key={kind}>
-            <CardHeader>
-              <CardTitle className="text-sm flex items-center gap-2 text-neutral-300">
-                <KindIcon kind={kind} />
+          <section key={kind} className="space-y-4">
+            <div className="flex items-center gap-2">
+              <KindIcon kind={kind} className="w-4 h-4 text-neutral-400" />
+              <h2 className="text-sm font-semibold text-neutral-300 uppercase tracking-wider">
                 {KIND_LABELS[kind]}
-                <span className="text-xs text-neutral-600 font-normal">({items.length})</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-xs text-neutral-500 border-b border-white/5">
-                      <th className="py-2 px-3 font-medium">Nom</th>
-                      <th className="py-2 px-3 font-medium">Type</th>
-                      <th className="py-2 px-3 font-medium">Taille</th>
-                      <th className="py-2 px-3 font-medium">Prix</th>
-                      <th className="py-2 px-3 font-medium text-center">Actif</th>
-                      <th className="py-2 px-3 font-medium text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((product) => (
-                      <ProductRow
-                        key={product.id}
-                        product={product}
-                        readOnly={readOnly}
-                        onSoftDelete={handleSoftDelete}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+              </h2>
+              <span className="text-xs text-neutral-600">({items.length})</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {items.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  readOnly={readOnly}
+                  onSoftDelete={handleSoftDelete}
+                  onUpdated={handleUpdated}
+                  onEdit={() => setEditingProduct(product)}
+                />
+              ))}
+            </div>
+          </section>
         ))
       )}
 
+      {/* Modal création */}
       {!readOnly && (
         <CreateProductModal
           open={createOpen}
           onClose={() => setCreateOpen(false)}
           producerId={producerId}
           onCreated={handleCreated}
+        />
+      )}
+
+      {/* Modal édition */}
+      {editingProduct && (
+        <ProductEditModal
+          open
+          onClose={() => setEditingProduct(null)}
+          product={editingProduct}
+          onUpdated={(updated) => {
+            handleUpdated(updated);
+            setEditingProduct(null);
+          }}
         />
       )}
     </div>

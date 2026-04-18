@@ -161,8 +161,10 @@ export default async function ShopPage() {
                     const product = wcp.products as unknown as {
                       id: string;
                       producer_id: string;
+                      kind: 'basket' | 'fruit_option' | 'egg_option' | 'other';
                       name: string;
                       description: string | null;
+                      photo_url: string | null;
                       is_active: boolean;
                     } | null;
                     if (!product) return null;
@@ -172,6 +174,8 @@ export default async function ShopPage() {
                         product_id={wcp.product_id}
                         product_name={product.name}
                         description={product.description}
+                        photo_url={product.photo_url}
+                        kind={product.kind}
                         unit_price_cents={wcp.price_snapshot_cents}
                         weekly_catalog_id={catalog.id}
                         producer_id={catalog.producer_id}
@@ -193,8 +197,10 @@ export default async function ShopPage() {
                     const product = wcp.products as unknown as {
                       id: string;
                       producer_id: string;
+                      kind: 'basket' | 'fruit_option' | 'egg_option' | 'other';
                       name: string;
                       description: string | null;
+                      photo_url: string | null;
                       is_active: boolean;
                     } | null;
                     if (!product) return null;
@@ -204,6 +210,8 @@ export default async function ShopPage() {
                         product_id={wcp.product_id}
                         product_name={product.name}
                         description={product.description}
+                        photo_url={product.photo_url}
+                        kind={product.kind}
                         unit_price_cents={wcp.price_snapshot_cents}
                         weekly_catalog_id={catalog.id}
                         producer_id={catalog.producer_id}
