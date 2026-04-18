@@ -39,6 +39,13 @@ Tournée hebdo auto-optimisée sur 6 arrêts Occitanie : **Toulouse · Labège (
 
 ![Tournée producteur optimisée OSRM](docs/screenshots/33-producer-route-osrm.png)
 
+### Navigation GPS 3D producteur (MapLibre)
+Mode conduite responsive : 100dvh, vocal turn-by-turn FR, wake lock, landscape auto. Flèche directionnelle qui tourne selon le bearing GPS.
+
+| Portrait | Landscape |
+|---|---|
+| ![Nav 3D portrait](docs/screenshots/34-nav-3d-mobile-idle.png) | ![Nav 3D landscape](docs/screenshots/36-nav-3d-mobile-landscape.png) |
+
 ### Mobile (iPhone 13)
 | Landing | Shop | Stats & badges |
 |---|---|---|
@@ -47,6 +54,24 @@ Tournée hebdo auto-optimisée sur 6 arrêts Occitanie : **Toulouse · Labège (
 | Admin | Forecast producteur | Produits producteur |
 |---|---|---|
 | ![Mobile admin](docs/screenshots/mobile-20-admin.png) | ![Mobile forecast](docs/screenshots/mobile-31-forecast.png) | ![Mobile products](docs/screenshots/mobile-33-products.png) |
+
+### Light mode
+<details>
+<summary>Voir les captures en light mode</summary>
+
+| Landing | Shop | Stats |
+|---|---|---|
+| ![Landing light](docs/screenshots/01-landing-light.png) | ![Shop light](docs/screenshots/10-shop-light.png) | ![Stats light](docs/screenshots/13-account-stats-light.png) |
+
+| Admin dashboard | Admin sales | Admin forecast |
+|---|---|---|
+| ![Admin light](docs/screenshots/20-admin-dashboard-light.png) | ![Admin sales light](docs/screenshots/21-admin-sales-light.png) | ![Admin forecast light](docs/screenshots/22-admin-forecast-light.png) |
+
+| Producer dashboard | Producer forecast | Producer catalog |
+|---|---|---|
+| ![Producer light](docs/screenshots/30-producer-dashboard-light.png) | ![Producer forecast light](docs/screenshots/31-producer-forecast-light.png) | ![Producer catalog light](docs/screenshots/32-producer-catalog-light.png) |
+
+</details>
 
 ---
 

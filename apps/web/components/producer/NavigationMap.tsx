@@ -235,27 +235,15 @@ export function NavigationMap({
         @import 'maplibre-gl/dist/maplibre-gl.css';
 
         .nav-position-marker {
-          width: 28px;
-          height: 28px;
+          width: 32px;
+          height: 32px;
           position: relative;
         }
-        .nav-position-marker .dot {
-          width: 22px;
-          height: 22px;
-          background: #2563eb;
-          border: 3px solid white;
-          border-radius: 50%;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          box-shadow: 0 0 0 3px rgba(37,99,235,0.4);
-          z-index: 2;
-        }
+        /* Halo circulaire pulsant (ne tourne pas avec le bearing) */
         .nav-position-marker .pulse {
-          width: 48px;
-          height: 48px;
-          background: rgba(37,99,235,0.15);
+          width: 56px;
+          height: 56px;
+          background: rgba(22,163,74,0.22);
           border-radius: 50%;
           position: absolute;
           top: 50%;
@@ -263,10 +251,22 @@ export function NavigationMap({
           transform: translate(-50%, -50%);
           animation: nav-pulse 2s ease-in-out infinite;
           z-index: 1;
+          pointer-events: none;
+        }
+        /* Flèche directionnelle (tourne selon le bearing via setRotation) */
+        .nav-position-marker .arrow {
+          width: 32px;
+          height: 32px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 2;
+          pointer-events: none;
         }
         @keyframes nav-pulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
-          50%       { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+          0%, 100% { transform: translate(-50%, -50%) scale(0.75); opacity: 0.9; }
+          50%       { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
 
         /* Enlarge all MapLibre control buttons for touch — Apple HIG 44px minimum */
@@ -300,13 +300,28 @@ function createPositionMarkerEl(): HTMLElement {
   const el = document.createElement('div');
   el.className = 'nav-position-marker';
 
-  const dot = document.createElement('div');
-  dot.className = 'dot';
-
+  // Halo pulsant (circulaire, ne tourne pas)
   const pulse = document.createElement('div');
   pulse.className = 'pulse';
 
+  // Flèche SVG qui tourne selon le bearing
+  const arrow = document.createElement('div');
+  arrow.className = 'arrow';
+  arrow.innerHTML = `
+    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-opacity="0.4"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <!-- Cone de direction (lumière devant la flèche) -->
+        <path d="M 16 4 L 28 28 L 16 22 L 4 28 Z" fill="#16A34A" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  `;
+
   el.appendChild(pulse);
-  el.appendChild(dot);
+  el.appendChild(arrow);
   return el;
 }
